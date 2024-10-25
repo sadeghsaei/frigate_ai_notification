@@ -861,9 +861,9 @@ action:
   - sequence:
     - service: camera.snapshot
       data:
-        filename: /config/www/tmp/snapshot-{{camera}}1.jpg
+        filename: /config/www/tmp/snapshot-backyard-1.jpg
       target:
-        device_id: 13aa5b4eea6805cbeb2d10570e8113f2
+        device_id: bd9cf02b3c6af3ccf28f66fe9f3f4829
       enabled: true
     - delay:
         hours: 0
@@ -873,9 +873,9 @@ action:
       enabled: true
     - service: camera.snapshot
       data:
-        filename: /config/www/tmp/snapshot-{{camera}}2.jpg
+        filename: /config/www/tmp/snapshot-backyard-2.jpg
       target:
-        device_id: 13aa5b4eea6805cbeb2d10570e8113f2
+        device_id: bd9cf02b3c6af3ccf28f66fe9f3f4829
       enabled: true
     - delay:
         hours: 0
@@ -885,18 +885,18 @@ action:
       enabled: true
     - service: camera.snapshot
       data:
-        filename: /config/www/tmp/snapshot-{{camera}}3.jpg
+        filename: /config/www/tmp/snapshot-backyard-3.jpg
       target:
-        device_id: 13aa5b4eea6805cbeb2d10570e8113f2
+        device_id: bd9cf02b3c6af3ccf28f66fe9f3f4829
       enabled: true
     - service: google_generative_ai_conversation.generate_content
       metadata: {}
       data:
         prompt: "{{ai_prompt}}"
         image_filename:
-          - /config/www/tmp/snapshot-{{camera}}1.jpg
-          - /config/www/tmp/snapshot-{{camera}}2.jpg
-          - /config/www/tmp/snapshot-{{camera}}3.jpg
+          - /config/www/tmp/snapshot-backyard-1.jpg
+          - /config/www/tmp/snapshot-backyard-2.jpg
+          - /config/www/tmp/snapshot-backyard-3.jpg
       response_variable: generated_content
 
   - choose:
