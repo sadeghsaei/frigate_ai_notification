@@ -861,7 +861,7 @@ action:
   - sequence:
     - service: camera.snapshot
       data:
-        filename: /config/www/tmp/snapshot-{{camera}}1.jpg
+        filename: /config/www/tmp/snapshot-driveway-1.jpg
       target:
         device_id: 6dbd624c7e89b9ad063ec15768611864
       enabled: true
@@ -873,7 +873,7 @@ action:
       enabled: true
     - service: camera.snapshot
       data:
-        filename: /config/www/tmp/snapshot-{{camera}}2.jpg
+        filename: /config/www/tmp/snapshot-driveway-2.jpg
       target:
         device_id: 6dbd624c7e89b9ad063ec15768611864
       enabled: true
@@ -885,7 +885,7 @@ action:
       enabled: true
     - service: camera.snapshot
       data:
-        filename: /config/www/tmp/snapshot-{{camera}}3.jpg
+        filename: /config/www/tmp/snapshot-driveway-3.jpg
       target:
         device_id: 6dbd624c7e89b9ad063ec15768611864
       enabled: true
@@ -894,9 +894,9 @@ action:
       data:
         prompt: "{{ai_prompt}}"
         image_filename:
-          - /config/www/tmp/snapshot-{{camera}}1.jpg
-          - /config/www/tmp/snapshot-{{camera}}2.jpg
-          - /config/www/tmp/snapshot-{{camera}}3.jpg
+          - /config/www/tmp/snapshot-driveway-1.jpg
+          - /config/www/tmp/snapshot-driveway-2.jpg
+          - /config/www/tmp/snapshot-driveway-3.jpg
       response_variable: generated_content
 
   - choose:
