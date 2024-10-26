@@ -865,7 +865,7 @@ action:
         prompt: "{{ai_prompt}}"
         image_filename:
           - /config/www/tmp/snapshot-{{ camera }}.jpg
-        response_variable: generated_content
+      response_variable: generated_content
 
   - choose:
       - alias: "Silence New Object Notifications"
