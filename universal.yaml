@@ -1,6 +1,6 @@
 blueprint:
-  name: Backyard Google AI Generated Frigate Notifications (0.12.0.4e)
-  author: SgtBatten
+  name: Google AI Generated Frigate Notifications (0.12.0.4e)
+  author: SASA 
   homeassistant:
     min_version: 2024.6.0
   description: |
@@ -134,11 +134,6 @@ blueprint:
         aiprompt:
           name: AI prompt
           description: The prompt to send to google.
-
-          default: ""
-        devicecameraid:
-          name: Camera ID
-          description: What is the camera ID?
 
           default: ""
         message:
@@ -861,9 +856,9 @@ action:
   - sequence:
     - service: camera.snapshot
       data:
-        filename: /config/www/tmp/snapshot-backyard-1.jpg
+        filename: /config/www/tmp/snapshot-{{ camera }}-1.jpg
       target:
-        device_id: bd9cf02b3c6af3ccf28f66fe9f3f4829
+        entity_id: "{{ input_camera }}"
       enabled: true
     - delay:
         hours: 0
@@ -873,9 +868,9 @@ action:
       enabled: true
     - service: camera.snapshot
       data:
-        filename: /config/www/tmp/snapshot-backyard-2.jpg
+        filename: /config/www/tmp/snapshot-{{ camera }}-2.jpg
       target:
-        device_id: bd9cf02b3c6af3ccf28f66fe9f3f4829
+        entity_id: "{{ input_camera }}"
       enabled: true
     - delay:
         hours: 0
@@ -894,9 +889,9 @@ action:
       data:
         prompt: "{{ai_prompt}}"
         image_filename:
-          - /config/www/tmp/snapshot-backyard-1.jpg
-          - /config/www/tmp/snapshot-backyard-2.jpg
-          - /config/www/tmp/snapshot-backyard-3.jpg
+          - /config/www/tmp/snapshot-{{ camera }}-1.jpg
+          - /config/www/tmp/snapshot-{{ camera }}-2.jpg
+          - /config/www/tmp/snapshot-{{ camera }}-3.jpg
       response_variable: generated_content
 
   - choose:
