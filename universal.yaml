@@ -810,7 +810,6 @@ variables:
   input_camera: !input camera
   camera: "{{ input_camera | regex_replace('^camera\\.', '') }}"
   camera_name: "{{ camera | replace('_', ' ') | title }}"
-  device_camera_id: !input devicecameraid
   input_base_url: !input base_url
   base_url: "{{ input_base_url.rstrip('/')}}"
   update_sub_label: !input update_sub_label
