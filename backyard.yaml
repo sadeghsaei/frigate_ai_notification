@@ -885,9 +885,9 @@ action:
       enabled: true
     - service: camera.snapshot
       data:
-        filename: /config/www/tmp/snapshot-backyard-3.jpg
+        filename: /config/www/tmp/snapshot-{{ camera }}-3.jpg
       target:
-        device_id: bd9cf02b3c6af3ccf28f66fe9f3f4829
+        entity_id: "{{ input_camera }}"
       enabled: true
     - service: google_generative_ai_conversation.generate_content
       metadata: {}
