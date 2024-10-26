@@ -891,7 +891,8 @@ action:
           - /config/www/tmp/snapshot-{{ camera }}-1.jpg
           - /config/www/tmp/snapshot-{{ camera }}-2.jpg
           - /config/www/tmp/snapshot-{{ camera }}-3.jpg
-    - response_variable: generated_content
+    - action
+      response_variable: generated_content
 
   - choose:
       - alias: "Silence New Object Notifications"
