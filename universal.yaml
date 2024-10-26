@@ -855,7 +855,19 @@ action:
   - sequence:
     - service: camera.snapshot
       data:
-        filename: /config/www/tmp/snapshot-{{ camera }}.jpg
+        filename: /config/www/tmp/snapshot-{{ camera }}-1.jpg
+      target:
+        entity_id: "{{ input_camera }}"
+      enabled: true
+    - delay:
+        hours: 0
+        minutes: 0
+        seconds: 1
+        milliseconds: 0
+      enabled: true
+    - service: camera.snapshot
+      data:
+        filename: /config/www/tmp/snapshot-{{ camera }}-2.jpg
       target:
         entity_id: "{{ input_camera }}"
       enabled: true
@@ -864,7 +876,8 @@ action:
       data:
         prompt: "{{ai_prompt}}"
         image_filename:
-          - /config/www/tmp/snapshot-{{ camera }}.jpg
+          - /config/www/tmp/snapshot-{{ camera }}-1.jpg
+          - /config/www/tmp/snapshot-{{ camera }}-2.jpg
       response_variable: generated_content
 
   - choose:
