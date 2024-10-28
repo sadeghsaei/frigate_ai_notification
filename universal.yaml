@@ -862,12 +862,24 @@ action:
     - delay:
         hours: 0
         minutes: 0
-        seconds: 1
-        milliseconds: 0
+        seconds: 0
+        milliseconds: 300
       enabled: true
     - service: camera.snapshot
       data:
         filename: /config/www/tmp/snapshot-{{ camera }}-2.jpg
+      target:
+        entity_id: "{{ input_camera }}"
+      enabled: true
+    - delay:
+        hours: 0
+        minutes: 0
+        seconds: 0
+        milliseconds: 300
+      enabled: true
+    - service: camera.snapshot
+      data:
+        filename: /config/www/tmp/snapshot-{{ camera }}-3.jpg
       target:
         entity_id: "{{ input_camera }}"
       enabled: true
@@ -878,6 +890,7 @@ action:
         image_filename:
           - /config/www/tmp/snapshot-{{ camera }}-1.jpg
           - /config/www/tmp/snapshot-{{ camera }}-2.jpg
+          - /config/www/tmp/snapshot-{{ camera }}-3.jpg
       response_variable: generated_content
 
   - choose:
