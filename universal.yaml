@@ -863,7 +863,7 @@ action:
         hours: 0
         minutes: 0
         seconds: 0
-        milliseconds: 400
+        milliseconds: 700
       enabled: true
     - service: camera.snapshot
       data:
@@ -875,7 +875,7 @@ action:
         hours: 0
         minutes: 0
         seconds: 0
-        milliseconds: 400
+        milliseconds: 700
       enabled: true
     - service: camera.snapshot
       data:
