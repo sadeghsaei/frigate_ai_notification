@@ -150,6 +150,8 @@ blueprint:
               options:
                 - label: "Default:   e.g., A Person was detected on the Side camera."
                   value: "A {{ label }} {{ 'is loitering' if loitering else 'was detected' }} on the {{ camera_name }} camera."
+                - label: "AI Generated"
+                  value: "{{generated_content['text']}}"
                 - label: "Short:     e.g., Person detected - Side"
                   value: "{{ label }} detected - {{ camera_name }}"
                 - label: "Short with a timestamp HH:MM"
@@ -807,6 +809,7 @@ trigger:
       action: "custom-{{ camera }}"
     id: custom
 variables:
+  ai_prompt: !input aiprompt
   input_camera: !input camera
   camera: "{{ input_camera | regex_replace('^camera\\.', '') }}"
   camera_name: "{{ camera | replace('_', ' ') | title }}"
@@ -1184,6 +1187,47 @@ action:
                     zone_only_changed: "{{ zone_only and (enteredzones|length > 0 and not last_zones|length) }}"
                     entered_zones_changed: "{{ zones|length > 0 and (zones|select('in', enteredzones)|list|length > zones|select('in', last_zones)|list|length) }}"
                     state_true: "{{ not state_only or states(input_entity)|lower in states_filter }}"
+                    
+                - alias: "Capture snapshots and update sub_label with AI content"
+                  sequence:
+                    - service: camera.snapshot
+                      data:
+                        filename: /config/www/tmp/snapshot-{{ camera }}-1.jpg
+                      target:
+                        entity_id: "{{ input_camera }}"
+                      enabled: true
+                    - delay:
+                      hours: 0
+                      minutes: 0
+                      seconds: 1
+                      milliseconds: 0
+                    - service: camera.snapshot
+                      data:
+                        filename: /config/www/tmp/snapshot-{{ camera }}-2.jpg
+                      target:
+                        entity_id: "{{ input_camera }}"
+                    - delay:
+                      hours: 0
+                      minutes: 0
+                      seconds: 1
+                      milliseconds: 0
+                    - service: camera.snapshot
+                      data:
+                        filename: /config/www/tmp/snapshot-{{ camera }}-3.jpg
+                      target:
+                        entity_id: "{{ input_camera }}"
+                    - service: google_generative_ai_conversation.generate_content
+                      metadata: {}
+                      data:
+                        prompt: "{{ ai_prompt }}"
+                        image_filename:
+                          - /config/www/tmp/snapshot-{{ camera }}-1.jpg
+                          - /config/www/tmp/snapshot-{{ camera }}-2.jpg
+                          - /config/www/tmp/snapshot-{{ camera }}-3.jpg
+                      response_variable: generated_content                    
+                    - variables:
+                      sub_label: "{{ generated_content['text'] if generated_content and 'text' in generated_content else sub_label }}"
+                    
                     sub_label: >
                       {% if event['after']['sub_label'] %} 
                         {{event['after']['sub_label'][0]}}
