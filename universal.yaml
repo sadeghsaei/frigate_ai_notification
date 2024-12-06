@@ -1191,40 +1191,40 @@ action:
                 - alias: "Capture snapshots and update sub_label with AI content"
                   sequence:
                     - service: camera.snapshot
-                      data:
-                        filename: /config/www/tmp/snapshot-{{ camera }}-1.jpg
-                      target:
-                        entity_id: "{{ input_camera }}"
-                      enabled: true
+                        data:
+                          filename: /config/www/tmp/snapshot-{{ camera }}-1.jpg
+                        target:
+                          entity_id: "{{ input_camera }}"
+                        enabled: true
                     - delay:
-                      hours: 0
-                      minutes: 0
-                      seconds: 1
-                      milliseconds: 0
+                        hours: 0
+                        minutes: 0
+                        seconds: 1
+                        milliseconds: 0
                     - service: camera.snapshot
-                      data:
-                        filename: /config/www/tmp/snapshot-{{ camera }}-2.jpg
-                      target:
-                        entity_id: "{{ input_camera }}"
+                        data:
+                          filename: /config/www/tmp/snapshot-{{ camera }}-2.jpg
+                        target:
+                          entity_id: "{{ input_camera }}"
                     - delay:
-                      hours: 0
-                      minutes: 0
-                      seconds: 1
-                      milliseconds: 0
+                        hours: 0
+                        minutes: 0
+                        seconds: 1
+                        milliseconds: 0
                     - service: camera.snapshot
-                      data:
-                        filename: /config/www/tmp/snapshot-{{ camera }}-3.jpg
-                      target:
-                        entity_id: "{{ input_camera }}"
+                        data:
+                          filename: /config/www/tmp/snapshot-{{ camera }}-3.jpg
+                        target:
+                          entity_id: "{{ input_camera }}"
                     - service: google_generative_ai_conversation.generate_content
-                      metadata: {}
-                      data:
-                        prompt: "{{ ai_prompt }}"
-                        image_filename:
-                          - /config/www/tmp/snapshot-{{ camera }}-1.jpg
-                          - /config/www/tmp/snapshot-{{ camera }}-2.jpg
-                          - /config/www/tmp/snapshot-{{ camera }}-3.jpg
-                      response_variable: generated_content                    
+                        metadata: {}
+                        data:
+                          prompt: "{{ ai_prompt }}"
+                          image_filename:
+                            - /config/www/tmp/snapshot-{{ camera }}-1.jpg
+                            - /config/www/tmp/snapshot-{{ camera }}-2.jpg
+                            - /config/www/tmp/snapshot-{{ camera }}-3.jpg
+                        response_variable: generated_content                    
                     - variables:
                       sub_label: "{{ generated_content['text'] if generated_content and 'text' in generated_content else sub_label }}"
                     
