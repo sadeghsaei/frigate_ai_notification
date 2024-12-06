@@ -1189,7 +1189,7 @@ action:
                     state_true: "{{ not state_only or states(input_entity)|lower in states_filter }}"
                     
                 - alias: "Capture snapshots and update sub_label with AI content"
-                    sequence:
+                  sequence:
                       - service: camera.snapshot
                         data:
                           filename: /config/www/tmp/snapshot-{{ camera }}-1.jpg
