@@ -1224,10 +1224,9 @@ action:
                       topic: "{{mqtt_topic}}"
                       payload: "{{ id }}"
                       value_template: "{{ value_json['after']['id'] }}"
-                    - platform: event
-                      event_type: google_gemini_response
-                      event_data:
-                        id: "{{ id }}"
+                    - trigger: state
+                      entity_id:
+                        - conversation.google_generative_ai
                   timeout:
                     seconds: 30
                   continue_on_timeout: false
