@@ -1505,11 +1505,11 @@ action:
                                       destructive: true
                 - alias: "Update Notification Based on Google Gemini Response"
                   sequence:
-                    - wait_for_trigger:
-                      - platform: event
-                        event_type: google_gemini_response
-                        event_data:
-                          id: "{{ id }}"
+                    - delay:
+                      hours: 0
+                      minutes: 0
+                      seconds: 5
+                      milliseconds: 0
                     - service: notify.mobile_app
                       data:
                         title: "Updated: {{title}}"
