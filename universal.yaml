@@ -1351,7 +1351,7 @@ action:
                                   domain: mobile_app
                                   type: notify
                                   title: "{{title}}"
-                                  message: "{{generated_content}}"
+                                  message: "{{generated_content.text}}"
                                   data:
                                     tag: "{{ id }}{{'-loitering' if loitering}}"
                                     group: "{{ group }}"
