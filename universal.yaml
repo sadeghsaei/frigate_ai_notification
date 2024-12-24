@@ -1506,10 +1506,7 @@ action:
                 - alias: "Update Notification Based on Google Gemini Response"
                   sequence:
                     - delay:
-                      hours: 0
-                      minutes: 0
                       seconds: 5
-                      milliseconds: 0
                     - service: notify.mobile_app
                       data:
                         title: "Updated: {{title}}"
