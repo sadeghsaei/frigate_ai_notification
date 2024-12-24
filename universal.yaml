@@ -1224,8 +1224,12 @@ action:
                       topic: "{{mqtt_topic}}"
                       payload: "{{ id }}"
                       value_template: "{{ value_json['after']['id'] }}"
+                    - platform: event
+                      event_type: google_gemini_response
+                      event_data:
+                        id: "{{ id }}"
                   timeout:
-                    minutes: 2
+                    seconds: 30
                   continue_on_timeout: false
                 - variables:
                     event: "{{ wait.trigger.payload_json }}"
