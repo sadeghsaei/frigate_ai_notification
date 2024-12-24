@@ -151,7 +151,7 @@ blueprint:
                 - label: "Default:   e.g., A Person was detected on the Side camera."
                   value: "A {{ label }} {{ 'is loitering' if loitering else 'was detected' }} on the {{ camera_name }} camera."
                 - label: "AI Generated"
-                  value: "{{generated_content['text']}}"
+                  value: "{{ label }} detected - {{ camera_name }} - Updating..."
                 - label: "Short:     e.g., Person detected - Side"
                   value: "{{ label }} detected - {{ camera_name }}"
                 - label: "Short with a timestamp HH:MM"
@@ -1163,6 +1163,60 @@ action:
                                 uri: "{{url_3}}"
                                 icon: "{{icon_3}}"
                                 destructive: true
+          - alias: "Send Photos to Google Gemini"
+            sequence:
+              - data:
+                  filename: /config/www/tmp/snapshot-{{ camera }}-1.jpg
+                target:
+                  entity_id: '{{ input_camera }}'
+                enabled: true
+                action: camera.snapshot
+              - delay:
+                  hours: 0
+                  minutes: 0
+                  seconds: 1
+                  milliseconds: 0
+                enabled: true
+              - data:
+                  filename: /config/www/tmp/snapshot-{{ camera }}-2.jpg
+                target:
+                  entity_id: '{{ input_camera }}'
+                enabled: true
+                action: camera.snapshot
+              - delay:
+                  hours: 0
+                  minutes: 0
+                  seconds: 1
+                  milliseconds: 0
+                enabled: true
+              - data:
+                  filename: /config/www/tmp/snapshot-{{ camera }}-3.jpg
+                target:
+                  entity_id: '{{ input_camera }}'
+                enabled: true
+                action: camera.snapshot
+              - delay:
+                  hours: 0
+                  minutes: 0
+                  seconds: 1
+                  milliseconds: 0
+                enabled: true
+              - data:
+                  filename: /config/www/tmp/snapshot-{{ camera }}-4.jpg
+                target:
+                  entity_id: '{{ input_camera }}'
+                enabled: true
+                action: camera.snapshot
+              - metadata: {}
+                data:
+                  prompt: '{{ai_prompt}}'
+                  image_filename:
+                    - /config/www/tmp/snapshot-{{ camera }}-1.jpg
+                    - /config/www/tmp/snapshot-{{ camera }}-2.jpg
+                    - /config/www/tmp/snapshot-{{ camera }}-3.jpg
+                    - /config/www/tmp/snapshot-{{ camera }}-4.jpg
+                response_variable: generated_content
+                action: google_generative_ai_conversation.generate_content
           - repeat:
               sequence:
                 - wait_for_trigger:
@@ -1187,47 +1241,6 @@ action:
                     zone_only_changed: "{{ zone_only and (enteredzones|length > 0 and not last_zones|length) }}"
                     entered_zones_changed: "{{ zones|length > 0 and (zones|select('in', enteredzones)|list|length > zones|select('in', last_zones)|list|length) }}"
                     state_true: "{{ not state_only or states(input_entity)|lower in states_filter }}"
-                    
-                - alias: "Capture snapshots and update sub_label with AI content"
-                  sequence:
-                    - service: camera.snapshot
-                      data:
-                        filename: /config/www/tmp/snapshot-{{ camera }}-1.jpg
-                      target:
-                        entity_id: "{{ input_camera }}"
-                      enabled: true
-                    - delay:
-                      hours: 0
-                      minutes: 0
-                      seconds: 1
-                      milliseconds: 0
-                    - service: camera.snapshot
-                      data:
-                        filename: /config/www/tmp/snapshot-{{ camera }}-2.jpg
-                      target:
-                        entity_id: "{{ input_camera }}"
-                    - delay:
-                      hours: 0
-                      minutes: 0
-                      seconds: 1
-                      milliseconds: 0
-                    - service: camera.snapshot
-                      data:
-                        filename: /config/www/tmp/snapshot-{{ camera }}-3.jpg
-                      target:
-                        entity_id: "{{ input_camera }}"
-                    - service: google_generative_ai_conversation.generate_content
-                      metadata: {}
-                      data:
-                        prompt: "{{ ai_prompt }}"
-                        image_filename:
-                          - /config/www/tmp/snapshot-{{ camera }}-1.jpg
-                          - /config/www/tmp/snapshot-{{ camera }}-2.jpg
-                          - /config/www/tmp/snapshot-{{ camera }}-3.jpg
-                      response_variable: generated_content                    
-                    - variables:
-                      sub_label: "{{ generated_content['text'] if generated_content and 'text' in generated_content else sub_label }}"
-                    
                     sub_label: >
                       {% if event['after']['sub_label'] %} 
                         {{event['after']['sub_label'][0]}}
@@ -1490,4 +1503,56 @@ action:
                                       uri: "{{url_3}}"
                                       icon: "{{icon_3}}"
                                       destructive: true
+                - alias: "Update Notification Based on Google Gemini Response"
+                  sequence:
+                    - wait_for_trigger:
+                      - platform: event
+                        event_type: google_gemini_response
+                        event_data:
+                          id: "{{ id }}"
+                  - service: notify.mobile_app
+                    data:
+                      title: "Updated: {{title}}"
+                      message: "Updated: {{message}} - {{generated_content}}"
+                      data:
+                        tag: "{{ id }}"
+                        group: "{{ group }}"
+                        color: "{{color}}"
+                        # Android Specific
+                        subject: "{{subtitle}}"
+                        image: "{{base_url}}/api/frigate{{client_id}}/notifications/{{id}}/{{attachment}}{{'&' if '?' in attachment else '?'}}format=android"
+                        video: "{{video}}"
+                        clickAction: "{{tap_action}}"
+                        ttl: 0
+                        priority: high
+                        notification_icon: "{{icon}}"
+                        sticky: "{{sticky}}"
+                        channel: "{{'alarm_stream' if critical else channel}}"
+                        car_ui: "{{android_auto}}"
+                        # iOS Specific
+                        subtitle: "{{subtitle}}"
+                        url: "{{tap_action}}"
+                        attachment:
+                          url: "{{base_url}}/api/frigate{{client_id}}/notifications/{{id}}/{{attachment}}"
+                        push:
+                          sound:
+                            name: "{{sound}}"
+                            volume: "{{ iif(sound == 'none', 0, volume) }}"
+                            critical: "{{ iif(critical, 1, 0) }}"
+                        entity_id: "{{ios_live_view}}"
+                        # Actions
+                        actions:
+                          - action: URI
+                            title: "{{button_1}}"
+                            uri: "{{url_1}}"
+                            icon: "{{icon_1}}"
+                          - action: URI
+                            title: "{{button_2}}"
+                            uri: "{{url_2}}"
+                            icon: "{{icon_2}}"
+                          - action: "{{ 'URI' if '/' in url_3 else url_3 }}"
+                            title: "{{button_3}}"
+                            uri: "{{url_3}}"
+                            icon: "{{icon_3}}"
+                            destructive: true
               until: "{{ not wait.trigger or wait.trigger.payload_json['type'] == 'end' }}"
