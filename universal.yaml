@@ -1274,7 +1274,7 @@ action:
                           - service: "notify.{{ notify_group_target }}"
                             data:
                               title: "{{title}}"
-                              message: "{{message}}"
+                              message: "{{generated_content.text}}"
                               data:
                                 tag: "{{ id }}{{'-loitering' if loitering}}"
                                 group: "{{ group }}"
@@ -1329,7 +1329,7 @@ action:
                       - service: "notify.{{ notify_group_target }}"
                         data:
                           title: "{{title}}"
-                          message: "{{message}}"
+                          message: "{{generated_content.text}}"
                           data:
                             tag: "{{ id }}{{'-loitering' if loitering}}"
                             group: "{{ group }}"
@@ -1457,7 +1457,7 @@ action:
                                   sublabel: {{sub_label}}, 
                                   image: "{{base_url}}/api/frigate{{client_id}}/notifications/{{id}}/{{attachment}}"
                                   Title: {{title}}
-                                  message: {{message}}
+                                  message: {{generated_content.text}}
                                   iOS sound: {{'Critical' if critical else 'disabled by alert once' if alert_once else 'enabled'}}, 
                                   Android Sound: {{'disabled by alert once' if alert_once else 'enabled'}}, 
                                   iOS url: /api/frigate{{client_id}}/notifications/{{id}}/{{camera + '/clip.mp4' if video|length>0 and wait.trigger.payload_json['type'] == 'end' else attachment }}
@@ -1560,7 +1560,7 @@ action:
                                 - service: "notify.{{ notify_group_target }}"
                                   data:
                                     title: "{{title}}"
-                                    message: "{{message}}"
+                                    message: "{{generated_content.text}}"
                                     data:
                                       tag: "{{ id }}{{'-loitering' if loitering}}"
                                       group: "{{ group }}"
@@ -1615,7 +1615,7 @@ action:
                             - service: "notify.{{ notify_group_target }}"
                               data:
                                 title: "{{title}}"
-                                message: "{{message}}"
+                                message: "{{generated_content.text}}"
                                 data:
                                   tag: "{{ id }}{{'-loitering' if loitering}}"
                                   group: "{{ group }}"
