@@ -1,6 +1,6 @@
 blueprint:
   name: Frigate Notifications (0.12.0.4e)
-  author: SgtBatten
+  author: sadeghsaei
   homeassistant:
     min_version: 2024.6.0
   description: |
@@ -71,11 +71,9 @@ blueprint:
     [2]: https://blakeblackshear.github.io/frigate/configuration/cameras#zones
     [3]: https://blakeblackshear.github.io/frigate/configuration/objects
 
-    ## Support
-    Go to https://github.com/SgtBatten/HA_blueprints to report bugs, request new features, or get support with your configuration.
 
   domain: automation
-  source_url: https://github.com/SgtBatten/HA_blueprints/blob/main/Frigate_Camera_Notifications/Stable.yaml
+  source_url: https://github.com/sadeghsaei/frigate_ai_notification/blob/main/universal.yaml
   input:
     camera:
       name: Frigate Camera
