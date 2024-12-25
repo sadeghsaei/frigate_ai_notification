@@ -1292,7 +1292,7 @@ action:
                           data_template:
                             name: Frigate Notification
                             message: |
-                              DEBUG (in loop): 
+                              DEBUG (in loop): {{ states('conversation.google_generative_ai') }}
                                 Send Notification: {{ loitering or (custom_filter and not home and zone_filter and zone_multi_filter and state_true and (new_snapshot or presence_changed or stationary_moved or zone_only_changed or entered_zones_changed or sub_label_changed)) }}
                                 Info: 
                                   sublabel: {{sub_label}}, 
