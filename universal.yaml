@@ -1217,7 +1217,7 @@ action:
                     - /config/www/tmp/snapshot-{{ camera }}-4.jpg
                 response_variable: generated_content
                 action: google_generative_ai_conversation.generate_content
-          - alias: "Update Notification for ai description"
+          - alias: "Update Notification"
             choose:
               - conditions: "{{ loitering or (custom_filter and not home and zone_filter and zone_multi_filter and state_true and (new_snapshot or presence_changed or stationary_moved or zone_only_changed or entered_zones_changed or sub_label_changed)) }}"
                 sequence:
@@ -1387,8 +1387,6 @@ action:
                       topic: "{{mqtt_topic}}"
                       payload: "{{ id }}"
                       value_template: "{{ value_json['after']['id'] }}"
-                    - platform: template
-                      value_template: "{{ generated_content is not none and generated_content != '' }}"
                   timeout:
                     seconds: 30
                   continue_on_timeout: false
