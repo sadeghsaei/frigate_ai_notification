@@ -1243,8 +1243,6 @@ action:
                               sticky: "{{sticky}}"
                               channel: "{{'alarm_stream' if critical else channel}}"
                               car_ui: "{{android_auto}}"
-                              style: "bigtext"  # Use BigTextStyle for longer text
-                              big_text: "{{generated_content.text}}"  # Set the full message text here
                               # iOS Specific
                               subtitle: "{{subtitle}}"
                               url: "{{tap_action}}"
