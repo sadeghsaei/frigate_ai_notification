@@ -1217,12 +1217,6 @@ action:
                     - /config/www/tmp/snapshot-{{ camera }}-4.jpg
                 response_variable: generated_content
                 action: google_generative_ai_conversation.generate_content
-              - delay:
-                  hours: 0
-                  minutes: 0
-                  seconds: 1
-                  milliseconds: 0
-                enabled: true
           - alias: "Update Notification for ai description"
             choose:
               - conditions: "{{ loitering or (custom_filter and not home and zone_filter and zone_multi_filter and state_true and (new_snapshot or presence_changed or stationary_moved or zone_only_changed or entered_zones_changed or sub_label_changed)) }}"
@@ -1236,7 +1230,7 @@ action:
                             title: "{{title}}"
                             message: "{{generated_content.text}}"
                             data:
-                            tag: "{{ id }}{{'-loitering' if loitering}}"
+                              tag: "{{ id }}{{'-loitering' if loitering}}"
                               group: "{{ group }}"
                               color: "{{color}}"
                               # Android Specific
@@ -1316,7 +1310,7 @@ action:
                                   sound:
                                     name: "{{ iif(update, 'none', sound) }}"
                                     volume: "{{ iif((update or sound == 'none'), 0, volume) }}"
-                                  critical: "{{ iif(critical, 1, 0) }}"
+                                    critical: "{{ iif(critical, 1, 0) }}"
                                 entity_id: "{{ios_live_view}}"
                                 # Actions
                                 actions:
@@ -1393,6 +1387,8 @@ action:
                       topic: "{{mqtt_topic}}"
                       payload: "{{ id }}"
                       value_template: "{{ value_json['after']['id'] }}"
+                    - platform: template
+                      value_template: "{{ generated_content is not none and generated_content != '' }}"
                   timeout:
                     seconds: 30
                   continue_on_timeout: false
