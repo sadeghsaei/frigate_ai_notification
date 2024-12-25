@@ -1225,7 +1225,7 @@ action:
                       payload: "{{ id }}"
                       value_template: "{{ value_json['after']['id'] }}"
                     - platform: template
-                      value_template: "{{ generated_content is not none and generated_content != '' }}"
+                      value_template: "{{ 'generated_content' is not none and 'generated_content' != '' }}"
                   timeout:
                     seconds: 30
                   continue_on_timeout: false
