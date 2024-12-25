@@ -1215,7 +1215,7 @@ action:
                     - /config/www/tmp/snapshot-{{ camera }}-4.jpg
                 response_variable: generated_content
                 action: google_generative_ai_conversation.generate_content
-          - alias: "Update Notification"
+          - alias: "Update Notification for AI Description"
             choose:
               - conditions: "{{ loitering or (custom_filter and not home and zone_filter and zone_multi_filter and state_true and (new_snapshot or presence_changed or stationary_moved or zone_only_changed or entered_zones_changed or sub_label_changed)) }}"
                 sequence:
@@ -1243,6 +1243,8 @@ action:
                               sticky: "{{sticky}}"
                               channel: "{{'alarm_stream' if critical else channel}}"
                               car_ui: "{{android_auto}}"
+                              style: "bigtext"  # Use BigTextStyle for longer text
+                              big_text: "{{message}}"  # Set the full message text here
                               # iOS Specific
                               subtitle: "{{subtitle}}"
                               url: "{{tap_action}}"
