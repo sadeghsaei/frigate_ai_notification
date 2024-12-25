@@ -1223,118 +1223,62 @@ action:
                   seconds: 1
                   milliseconds: 0
                 enabled: true
-
-              - alias: "Update Notification for ai description"
-                choose:
-                  - conditions: "{{ loitering or (custom_filter and not home and zone_filter and zone_multi_filter and state_true and (new_snapshot or presence_changed or stationary_moved or zone_only_changed or entered_zones_changed or sub_label_changed)) }}"
-                    sequence:
-                      - choose:
-                          - conditions: "{{ not notify_group_target }}"
-                            sequence:
-                              - device_id: !input notify_device
-                                domain: mobile_app
-                                type: notify
-                                title: "{{title}}"
-                                message: "{{generated_content.text}}"
-                                data:
-                                  tag: "{{ id }}{{'-loitering' if loitering}}"
-                                  group: "{{ group }}"
-                                  color: "{{color}}"
-                                  # Android Specific
-                                  subject: "{{subtitle}}"
-                                  image: "{{base_url}}/api/frigate{{client_id}}/notifications/{{id}}/{{attachment}}{{'&' if '?' in attachment else '?'}}format=android"
-                                  video: "{{video}}"
-                                  clickAction: "{{tap_action}}"
-                                  ttl: 0
-                                  priority: high
-                                  alert_once: "{{ alert_once }}"
-                                  notification_icon: "{{icon}}"
-                                  sticky: "{{sticky}}"
-                                  channel: "{{'alarm_stream' if critical else channel}}"
-                                  car_ui: "{{android_auto}}"
-                                  # iOS Specific
-                                  subtitle: "{{subtitle}}"
-                                  url: "{{tap_action}}"
-                                  attachment:
-                                    url: "{{base_url}}/api/frigate{{client_id}}/notifications/{{id}}/{{camera + '/clip.mp4' if video|length>0 and wait.trigger.payload_json['type'] == 'end' else attachment }}"
-                                  push:
-                                    sound:
-                                      name: "{{ iif(update, 'none', sound) }}"
-                                      volume: "{{ iif((update or sound == 'none'), 0, volume) }}"
-                                      critical: "{{ iif(critical, 1, 0) }}"
-                                  entity_id: "{{ios_live_view}}"
-                                  # Actions
-                                  actions:
-                                    - action: URI
-                                      title: "{{button_1}}"
-                                      uri: "{{url_1}}"
-                                      icon: "{{icon_1}}"
-                                    - action: URI
-                                      title: "{{button_2}}"
-                                      uri: "{{url_2}}"
-                                      icon: "{{icon_2}}"
-                                    - action: "{{ 'URI' if '/' in url_3 else url_3 }}"
-                                      title: "{{button_3}}"
-                                      uri: "{{url_3}}"
-                                      icon: "{{icon_3}}"
-                                      destructive: true
-                          - conditions: "{{ tv }}"
-                            sequence:
-                              - service: "notify.{{ notify_group_target }}"
-                                data:
-                                  title: "{{title}}"
-                                  message: "{{message}}"
-                                  data:
-                                    tag: "{{ id }}{{'-loitering' if loitering}}"
-                                    group: "{{ group }}"
-                                    color: "{{color}}"
-                                    # Android Specific
-                                    subject: "{{subtitle}}"
-                                    clickAction: "{{tap_action}}"
-                                    ttl: 0
-                                    priority: high
-                                    alert_once: "{{ alert_once }}"
-                                    notification_icon: "{{icon}}"
-                                    sticky: "{{sticky}}"
-                                    channel: "{{'alarm_stream' if critical else channel}}"
-                                    car_ui: "{{android_auto}}"
-                                    # Android/Fire TV
-                                    image:
-                                      url: "{{base_url}}/api/frigate{{client_id}}/notifications/{{id}}/snapshot.jpg"
-                                    video: "{{video}}"
-                                    fontsize: "{{tv_size}}"
-                                    position: "{{tv_position}}"
-                                    duration: "{{tv_duration}}"
-                                    transparency: "{{tv_transparency}}"
-                                    interrupt: "{{tv_interrupt}}"
-                                    timeout: 30
-                                    # iOS Specific
-                                    subtitle: "{{subtitle}}"
-                                    url: "{{tap_action}}"
-                                    attachment:
-                                      url: "{{base_url}}/api/frigate{{client_id}}/notifications/{{id}}/{{camera + '/clip.mp4' if video|length>0 and wait.trigger.payload_json['type'] == 'end' else attachment }}"
-                                    push:
-                                      sound:
-                                        name: "{{ iif(update, 'none', sound) }}"
-                                        volume: "{{ iif((update or sound == 'none'), 0, volume) }}"
-                                        critical: "{{ iif(critical, 1, 0) }}"
-                                    entity_id: "{{ios_live_view}}"
-                                    # Actions
-                                    actions:
-                                      - action: URI
-                                        title: "{{button_1}}"
-                                        uri: "{{url_1}}"
-                                        icon: "{{icon_1}}"
-                                      - action: URI
-                                        title: "{{button_2}}"
-                                        uri: "{{url_2}}"
-                                        icon: "{{icon_2}}"
-                                      - action: "{{ 'URI' if '/' in url_3 else url_3 }}"
-                                        title: "{{button_3}}"
-                                        uri: "{{url_3}}"
-                                        icon: "{{icon_3}}"
-                                        destructive: true
-                        default:
+          - alias: "Update Notification for ai description"
+            choose:
+              - conditions: "{{ loitering or (custom_filter and not home and zone_filter and zone_multi_filter and state_true and (new_snapshot or presence_changed or stationary_moved or zone_only_changed or entered_zones_changed or sub_label_changed)) }}"
+                sequence:
+                  - choose:
+                      - conditions: "{{ not notify_group_target }}"
+                        sequence:
+                          - device_id: !input notify_device
+                            domain: mobile_app
+                            type: notify
+                            title: "{{title}}"
+                            message: "{{generated_content.text}}"
+                            data:
+                            tag: "{{ id }}{{'-loitering' if loitering}}"
+                              group: "{{ group }}"
+                              color: "{{color}}"
+                              # Android Specific
+                              subject: "{{subtitle}}"
+                              image: "{{base_url}}/api/frigate{{client_id}}/notifications/{{id}}/{{attachment}}{{'&' if '?' in attachment else '?'}}format=android"
+                              video: "{{video}}"
+                              clickAction: "{{tap_action}}"
+                              ttl: 0
+                              priority: high
+                              alert_once: "{{ alert_once }}"
+                              notification_icon: "{{icon}}"
+                              sticky: "{{sticky}}"
+                              channel: "{{'alarm_stream' if critical else channel}}"
+                              car_ui: "{{android_auto}}"
+                              # iOS Specific
+                              subtitle: "{{subtitle}}"
+                              url: "{{tap_action}}"
+                              attachment:
+                                url: "{{base_url}}/api/frigate{{client_id}}/notifications/{{id}}/{{camera + '/clip.mp4' if video|length>0 and wait.trigger.payload_json['type'] == 'end' else attachment }}"
+                              push:
+                                sound:
+                                  name: "{{ iif(update, 'none', sound) }}"
+                                  volume: "{{ iif((update or sound == 'none'), 0, volume) }}"
+                                  critical: "{{ iif(critical, 1, 0) }}"
+                              entity_id: "{{ios_live_view}}"
+                              # Actions
+                              actions:
+                                - action: URI
+                                  title: "{{button_1}}"
+                                  uri: "{{url_1}}"
+                                  icon: "{{icon_1}}"
+                                - action: URI
+                                  title: "{{button_2}}"
+                                  uri: "{{url_2}}"
+                                  icon: "{{icon_2}}"
+                                - action: "{{ 'URI' if '/' in url_3 else url_3 }}"
+                                  title: "{{button_3}}"
+                                  uri: "{{url_3}}"
+                                  icon: "{{icon_3}}"
+                                  destructive: true
+                      - conditions: "{{ tv }}"
+                        sequence:
                           - service: "notify.{{ notify_group_target }}"
                             data:
                               title: "{{title}}"
@@ -1345,8 +1289,6 @@ action:
                                 color: "{{color}}"
                                 # Android Specific
                                 subject: "{{subtitle}}"
-                                image: "{{base_url}}/api/frigate{{client_id}}/notifications/{{id}}/{{attachment}}{{'&' if '?' in attachment else '?'}}format=android"
-                                video: "{{video}}"
                                 clickAction: "{{tap_action}}"
                                 ttl: 0
                                 priority: high
@@ -1356,11 +1298,15 @@ action:
                                 channel: "{{'alarm_stream' if critical else channel}}"
                                 car_ui: "{{android_auto}}"
                                 # Android/Fire TV
+                                image:
+                                  url: "{{base_url}}/api/frigate{{client_id}}/notifications/{{id}}/snapshot.jpg"
+                                video: "{{video}}"
                                 fontsize: "{{tv_size}}"
                                 position: "{{tv_position}}"
                                 duration: "{{tv_duration}}"
                                 transparency: "{{tv_transparency}}"
                                 interrupt: "{{tv_interrupt}}"
+                                timeout: 30
                                 # iOS Specific
                                 subtitle: "{{subtitle}}"
                                 url: "{{tap_action}}"
@@ -1370,7 +1316,7 @@ action:
                                   sound:
                                     name: "{{ iif(update, 'none', sound) }}"
                                     volume: "{{ iif((update or sound == 'none'), 0, volume) }}"
-                                    critical: "{{ iif(critical, 1, 0) }}"
+                                  critical: "{{ iif(critical, 1, 0) }}"
                                 entity_id: "{{ios_live_view}}"
                                 # Actions
                                 actions:
@@ -1387,7 +1333,59 @@ action:
                                     uri: "{{url_3}}"
                                     icon: "{{icon_3}}"
                                     destructive: true
-
+                    default:
+                      - service: "notify.{{ notify_group_target }}"
+                        data:
+                          title: "{{title}}"
+                          message: "{{message}}"
+                          data:
+                            tag: "{{ id }}{{'-loitering' if loitering}}"
+                            group: "{{ group }}"
+                            color: "{{color}}"
+                            # Android Specific
+                            subject: "{{subtitle}}"
+                            image: "{{base_url}}/api/frigate{{client_id}}/notifications/{{id}}/{{attachment}}{{'&' if '?' in attachment else '?'}}format=android"
+                            video: "{{video}}"
+                            clickAction: "{{tap_action}}"
+                            ttl: 0
+                            priority: high
+                            alert_once: "{{ alert_once }}"
+                            notification_icon: "{{icon}}"
+                            sticky: "{{sticky}}"
+                            channel: "{{'alarm_stream' if critical else channel}}"
+                            car_ui: "{{android_auto}}"
+                            # Android/Fire TV
+                            fontsize: "{{tv_size}}"
+                            position: "{{tv_position}}"
+                            duration: "{{tv_duration}}"
+                            transparency: "{{tv_transparency}}"
+                            interrupt: "{{tv_interrupt}}"
+                            # iOS Specific
+                            subtitle: "{{subtitle}}"
+                            url: "{{tap_action}}"
+                            attachment:
+                              url: "{{base_url}}/api/frigate{{client_id}}/notifications/{{id}}/{{camera + '/clip.mp4' if video|length>0 and wait.trigger.payload_json['type'] == 'end' else attachment }}"
+                            push:
+                              sound:
+                                name: "{{ iif(update, 'none', sound) }}"
+                                volume: "{{ iif((update or sound == 'none'), 0, volume) }}"
+                                critical: "{{ iif(critical, 1, 0) }}"
+                            entity_id: "{{ios_live_view}}"
+                            # Actions
+                            actions:
+                              - action: URI
+                                title: "{{button_1}}"
+                                uri: "{{url_1}}"
+                                icon: "{{icon_1}}"
+                              - action: URI
+                                title: "{{button_2}}"
+                                uri: "{{url_2}}"
+                                icon: "{{icon_2}}"
+                              - action: "{{ 'URI' if '/' in url_3 else url_3 }}"
+                                title: "{{button_3}}"
+                                uri: "{{url_3}}"
+                                icon: "{{icon_3}}"
+                                destructive: true
           - repeat:
               sequence:
                 - wait_for_trigger:
