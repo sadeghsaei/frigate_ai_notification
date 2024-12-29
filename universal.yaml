@@ -1169,6 +1169,7 @@ action:
             action: telegram_bot.send_photo
             data:
               url: "{{base_url}}/api/frigate{{client_id}}/notifications/{{id}}/{{attachment}}{{'&' if '?' in attachment else '?'}}format=android"
+              caption: "{{message}}"
           - alias: "Send Photos to Google Gemini"
             sequence:
               - data:
