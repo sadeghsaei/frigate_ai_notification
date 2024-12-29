@@ -1271,11 +1271,9 @@ action:
                       icon: "{{icon_3}}"
                       destructive: true
           - alias: "Send Telegram Notification"
-            actions:
-              - action: telegram_bot.send_message
-                metadata: {}
-                data:
-                  message: "{{generated_content.text}}"
+            action: telegram_bot.send_message
+              data:
+                message: "{{generated_content.text}}"
           - repeat:
               sequence:
                 - wait_for_trigger:
