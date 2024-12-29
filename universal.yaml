@@ -1,5 +1,5 @@
 blueprint:
-  name: Frigate Notifications (0.12.0.4e3)
+  name: Frigate Notifications (0.12.0.4e4)
   author: sadeghsaei
   homeassistant:
     min_version: 2024.6.0
@@ -1273,7 +1273,7 @@ action:
               - alias: "Telegram AI Description"
                 action: telegram_bot.send_message
                 data:
-                  message: "{{generated_content.text}}"
+                  message: "{{base_url}}/api/frigate{{client_id}}/notifications/{{id}}/{{camera + '/clip.mp4'}}"
                   data:
                     video:
                       - url: "{{base_url}}/api/frigate{{client_id}}/notifications/{{id}}/{{camera + '/clip.mp4'}}"
