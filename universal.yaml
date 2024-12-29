@@ -1270,6 +1270,14 @@ action:
                       uri: "{{url_3}}"
                       icon: "{{icon_3}}"
                       destructive: true
+          - alias: "Send Telegram Notification"
+            sequence:
+              - service: notify.telegram
+                data:
+                  message: "{{title}}: {{generated_content.text}}"
+                  data:
+                    photo:
+                      - url: "{{base_url}}/api/frigate{{client_id}}/notifications/{{id}}/{{attachment}}"
           - repeat:
               sequence:
                 - wait_for_trigger:
