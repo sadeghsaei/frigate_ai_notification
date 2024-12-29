@@ -1,5 +1,5 @@
 blueprint:
-  name: Frigate Notifications (0.12.0.4e1)
+  name: Frigate Notifications (0.12.0.4e2)
   author: sadeghsaei
   homeassistant:
     min_version: 2024.6.0
@@ -1276,7 +1276,7 @@ action:
                   message: "{{generated_content.text}}"
                   data:
                     video:
-                      - url: "{{video}}"
+                      - url: "{{base_url}}/api/frigate{{client_id}}/notifications/{{id}}/{{camera + '/clip.mp4' if video|length>0 and wait.trigger.payload_json['type'] == 'end' else attachment }}"
           - repeat:
               sequence:
                 - wait_for_trigger:
