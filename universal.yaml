@@ -1270,9 +1270,13 @@ action:
                       uri: "{{url_3}}"
                       icon: "{{icon_3}}"
                       destructive: true
-              - action: telegram_bot.send_message
+              - alias: "Telegram AI Description"
+                action: telegram_bot.send_message
                 data:
                   message: "{{generated_content.text}}"
+                  data:
+                    video:
+                      - url: "{{base_url}}/api/frigate{{client_id}}/notifications/{{id}}/{{camera + '/clip.mp4' if video|length>0 and wait.trigger.payload_json['type'] == 'end' else attachment }}"
           - repeat:
               sequence:
                 - wait_for_trigger:
