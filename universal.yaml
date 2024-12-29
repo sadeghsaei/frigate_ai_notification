@@ -1,5 +1,5 @@
 blueprint:
-  name: Frigate Notifications (0.12.0.4e10)
+  name: Frigate Notifications (0.12.0.4e11)
   author: sadeghsaei
   homeassistant:
     min_version: 2024.6.0
@@ -1285,6 +1285,7 @@ action:
                       seconds: 5
               - alias: "Delete Last Message"
                 action: telegram_bot.delete_message
+                data:
                   chat_id: 626475484
                   message_id: "last"
               - alias: "Telegram AI Video"
