@@ -1218,7 +1218,7 @@ action:
               - delay:
                   hours: 0
                   minutes: 0
-                  seconds: 1
+                  seconds: 2
                   milliseconds: 0
                 enabled: true
           - alias: "Update Notification for AI Description"
