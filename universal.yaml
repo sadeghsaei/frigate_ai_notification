@@ -1,5 +1,5 @@
 blueprint:
-  name: Frigate Notifications (0.12.0.4e19)
+  name: Frigate Notifications (0.12.0.4e20)
   author: sadeghsaei
   homeassistant:
     min_version: 2024.6.0
@@ -915,7 +915,6 @@ action:
               channel: !input channel
               video: !input video
               custom_action_auto: !input custom_action_auto
-              last_message_id: ""
           - alias: "Debug: write to Log"
             choose:
               - conditions:
@@ -1167,19 +1166,6 @@ action:
             data:
               url: "{{base_url}}/api/frigate{{client_id}}/notifications/{{id}}/{{attachment}}{{'&' if '?' in attachment else '?'}}format=android"
               caption: "{{message}}"
-              #message_tag: "person_detected_sent"
-              #last_message_id: "{{ trigger.event.data.message_id }}"
-          #- alias: 'Notifications about messages sent by Telegram bot'
-          #  triggers:
-          #    - trigger: event
-          #      event_type: telegram_sent
-          #      event_data:
-          #        message_tag: "person_detected_sent"
-          #  actions:
-          #    - action: input_number.set_value
-          #      data_template:
-          #        entity_id: input_number.message_id
-          #        value: "{{ trigger.event.data.message_id }}"
           - alias: "Send Photos to Google Gemini"
             sequence:
               - data:
@@ -1289,17 +1275,19 @@ action:
                       uri: "{{url_3}}"
                       icon: "{{icon_3}}"
                       destructive: true
-              #- alias: "Telegram AI Description"
-              #  action: telegram_bot.edit_caption
-              #  data:
-              #    message_id: "{{ last_message_id}}"
-              #    chat_id: 626475484
-              #    caption: "{{generated_content.text}}"
+              - alias: "Telegram AI Description"
+                action: telegram_bot.send_message
+                data:
+                  message: "{{generated_content.text}}"
               - alias: "Delay for video to be Ready"
                 sequence:
-                  - wait_template: "{{ is_state('binary_sensor.basement_all_occupancy', 'off') }}"
-                    timeout: '00:10:00'  # Adjust the timeout as needed
-                    continue_on_timeout: false
+                  - delay:
+                      seconds: 5
+              - alias: "Delete Last Message"
+                action: telegram_bot.delete_message
+                data:
+                  chat_id: 626475484
+                  message_id: "last"
               - alias: "Telegram AI Video"
                 action: telegram_bot.send_video
                 data:
