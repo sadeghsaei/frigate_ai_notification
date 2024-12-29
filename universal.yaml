@@ -1276,7 +1276,7 @@ action:
                   message: "{{generated_content.text}}"
                   data:
                     video:
-                      - url: "{{base_url}}/api/frigate{{client_id}}/notifications/{{id}}/{{camera + '/clip.mp4' if video|length>0 and wait.trigger.payload_json['type'] == 'end' else attachment }}"
+                      - url: "{{video}}"
           - repeat:
               sequence:
                 - wait_for_trigger:
