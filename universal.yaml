@@ -1,5 +1,5 @@
 blueprint:
-  name: Frigate Notifications (0.12.0.5e)
+  name: Frigate Notifications (0.12.0.4e7)
   author: sadeghsaei
   homeassistant:
     min_version: 2024.6.0
@@ -1161,6 +1161,14 @@ action:
                                 uri: "{{url_3}}"
                                 icon: "{{icon_3}}"
                                 destructive: true
+          - alias: "Telegram Normal Notification"
+            action: telegram_bot.send_message
+            data:
+              message: "{{message}}"
+          - alias: "Telegram Normal Image"
+            action: telegram_bot.send_photo
+            data:
+              url: "{{base_url}}/api/frigate{{client_id}}/notifications/{{id}}/{{attachment}}{{'&' if '?' in attachment else '?'}}format=android"
           - alias: "Send Photos to Google Gemini"
             sequence:
               - data:
