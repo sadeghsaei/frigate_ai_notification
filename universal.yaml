@@ -11,7 +11,6 @@ blueprint:
     With this blueprint, you may send the notification to multiple devices by leaving "Device" blank and instead use a [notification group][1].
 
     ### Software Version Requirements
-    
       - Minimum Home Assistant Version: 2022.2
       - Minimum Frigate Version: 0.11.0
       - Minimum Frigate Integration Version: 3.0.0
@@ -1276,7 +1275,7 @@ action:
               - action: telegram_bot.send_message
                 metadata: {}
                 data:
-                  message: text: "{{generated_content.text}}"
+                  message: "{{generated_content.text}}"
           - repeat:
               sequence:
                 - wait_for_trigger:
