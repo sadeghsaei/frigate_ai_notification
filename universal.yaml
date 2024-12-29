@@ -1,5 +1,5 @@
 blueprint:
-  name: Frigate Notifications (0.12.0.4e16)
+  name: Frigate Notifications (0.12.0.4e17)
   author: sadeghsaei
   homeassistant:
     min_version: 2024.6.0
@@ -1167,19 +1167,19 @@ action:
             data:
               url: "{{base_url}}/api/frigate{{client_id}}/notifications/{{id}}/{{attachment}}{{'&' if '?' in attachment else '?'}}format=android"
               caption: "{{message}}"
-              message_tag: "person_detected_sent"
+              #message_tag: "person_detected_sent"
               #last_message_id: "{{ trigger.event.data.message_id }}"
-          - alias: 'Notifications about messages sent by Telegram bot'
-            triggers:
-              - trigger: event
-                event_type: telegram_sent
-                event_data:
-                  message_tag: "person_detected_sent"
-            actions:
-              - action: input_number.set_value
-                data_template:
-                  entity_id: input_number.message_id
-                  value: "{{ trigger.event.data.message_id }}"
+          #- alias: 'Notifications about messages sent by Telegram bot'
+          #  triggers:
+          #    - trigger: event
+          #      event_type: telegram_sent
+          #      event_data:
+          #        message_tag: "person_detected_sent"
+          #  actions:
+          #    - action: input_number.set_value
+          #      data_template:
+          #        entity_id: input_number.message_id
+          #        value: "{{ trigger.event.data.message_id }}"
           - alias: "Send Photos to Google Gemini"
             sequence:
               - data:
