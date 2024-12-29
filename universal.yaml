@@ -1,5 +1,5 @@
 blueprint:
-  name: Frigate Notifications (0.12.0.4e17)
+  name: Frigate Notifications (0.12.0.4e18)
   author: sadeghsaei
   homeassistant:
     min_version: 2024.6.0
@@ -1296,14 +1296,19 @@ action:
               #    chat_id: 626475484
               #    caption: "{{generated_content.text}}"
               - alias: "Delay for video to be Ready"
-                sequence:
-                  - delay:
-                      seconds: 5
-              - alias: "Telegram AI Video"
-                action: telegram_bot.send_video
-                data:
-                  url: "{{base_url}}/api/frigate{{client_id}}/notifications/{{id}}/{{camera + '/clip.mp4'}}"
-                  caption: "{{generated_content.text}}"
+                triggers:
+                  - trigger: state
+                    entity_id:
+                      - binary_sensor.basement_all_occupancy
+                    to: "off"
+                conditions: []
+                actions:
+                  - action: telegram_bot.send_video
+                    metadata: {}
+                    data:
+                      url: "{{base_url}}/api/frigate{{client_id}}/notifications/{{id}}/{{camera + '/clip.mp4'}}"
+                      caption: "{{generated_content.text}}"
+                mode: single
           - repeat:
               sequence:
                 - wait_for_trigger:
