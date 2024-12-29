@@ -1271,13 +1271,9 @@ action:
                       icon: "{{icon_3}}"
                       destructive: true
           - alias: "Send Telegram Notification"
-            sequence:
-              - service: notify.telegram
-                data:
-                  message: "{{title}}: {{generated_content.text}}"
-                  data:
-                    photo:
-                      - url: "{{base_url}}/api/frigate{{client_id}}/notifications/{{id}}/{{attachment}}"
+            action: notify.ai_notifier
+              data:
+                message: {{generated_content.text}}
           - repeat:
               sequence:
                 - wait_for_trigger:
