@@ -1,5 +1,5 @@
 blueprint:
-  name: Frigate Notifications (0.12.0.4e14)
+  name: Frigate Notifications (0.12.0.4e15)
   author: sadeghsaei
   homeassistant:
     min_version: 2024.6.0
@@ -1216,7 +1216,7 @@ action:
                 data:
                   prompt: '{{ai_prompt}}'
                   image_filename:
-                    - "/api/frigate{{client_id}}/notifications/{{id}}/{{attachment}}"
+                    - "{{base_url}}/api/frigate{{client_id}}/notifications/{{id}}/{{attachment}}"
                     - /config/www/tmp/snapshot-{{ camera }}-1.jpg
                     - /config/www/tmp/snapshot-{{ camera }}-2.jpg
                     - /config/www/tmp/snapshot-{{ camera }}-3.jpg
