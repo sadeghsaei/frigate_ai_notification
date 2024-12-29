@@ -1272,8 +1272,8 @@ action:
                       destructive: true
           - alias: "Send Telegram Notification"
             action: telegram_bot.send_message
-              data:
-                message: "{{generated_content.text}}"
+            data:
+              message: "{{generated_content.text}}"
           - repeat:
               sequence:
                 - wait_for_trigger:
