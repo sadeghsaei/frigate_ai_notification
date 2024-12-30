@@ -1,5 +1,5 @@
 blueprint:
-  name: Frigate Notifications (0.12.0.4e21)
+  name: Frigate Notifications (0.12.0.4e22)
   author: sadeghsaei
   homeassistant:
     min_version: 2024.6.0
@@ -1275,10 +1275,6 @@ action:
                       uri: "{{url_3}}"
                       icon: "{{icon_3}}"
                       destructive: true
-              - alias: "Telegram AI Description"
-                action: telegram_bot.send_message
-                data:
-                  message: "{{generated_content.text}}"
               - alias: "Delay for video to be Ready"
                 sequence:
                   - delay:
