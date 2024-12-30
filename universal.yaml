@@ -1,5 +1,5 @@
 blueprint:
-  name: Frigate Notifications (0.12.0.4e24)
+  name: Frigate Notifications (0.12.0.4e25)
   author: sadeghsaei
   homeassistant:
     min_version: 2024.6.0
@@ -1169,16 +1169,14 @@ action:
               caption: "{{message}}"
               message_tag: "msg_start"
           - alias: "Capture Telegram Message ID"
-            trigger:
+            wait_for_trigger:
               - platform: event
                 event_type: telegram_sent
                 event_data:
                   message_tag: "msg_start"
-            action:
-              - service: variable.set
-                data:
-                  variable: last_message_id
-                  value: "{{ trigger.event.data.message_id }}"
+            continue_on_timeout: false
+          - variables:
+              last_message_id: "{{ wait.trigger.event.data.message_id }}"
           - alias: "Send Photos to Google Gemini"
             sequence:
               - data:
