@@ -1,5 +1,5 @@
 blueprint:
-  name: Frigate Notifications (0.12.0.4e26)
+  name: Frigate Notifications (0.12.0.4e27)
   author: sadeghsaei
   homeassistant:
     min_version: 2024.6.0
@@ -1162,17 +1162,11 @@ action:
                                 uri: "{{url_3}}"
                                 icon: "{{icon_3}}"
                                 destructive: true
-          - alias: "Telegram Normal Image"
-            action: telegram_bot.send_photo
+          - alias: "Telegram first text"
+            action: telegram_bot.send_message
             data:
-              url: "{{base_url}}/api/frigate{{client_id}}/notifications/{{id}}/{{attachment}}{{'&' if '?' in attachment else '?'}}format=android"
-              caption: "{{message}}"
+              message: "{{message}}"
               message_tag: "msg_start"
-          - delay:
-              hours: 0
-              minutes: 0
-              seconds: 1
-              milliseconds: 0
           - alias: "Capture Telegram Message ID"
             trigger:
               - platform: event
