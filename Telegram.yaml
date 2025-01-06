@@ -1,5 +1,5 @@
 blueprint:
-  name: Frigate Notifications (telegram-06)
+  name: Frigate Notifications (telegram-07)
   author: sadeghsaei
   homeassistant:
     min_version: 2024.6.0
@@ -425,3 +425,12 @@ action:
             data:
               url: "{{base_url}}/api/frigate{{client_id}}/notifications/{{id}}/{{attachment}}{{'&' if '?' in attachment else '?'}}format=android"
               caption: "{{ camera }} - {{generated_content.text}}"
+          - alias: "Delay for video to be Ready"
+            sequence:
+              - delay:
+                  seconds: 10
+          - alias: "Telegram AI Video"
+            action: telegram_bot.send_video
+            data:
+              url: "{{base_url}}/api/frigate{{client_id}}/notifications/{{id}}/{{camera + '/clip.mp4'}}"
+              caption: "{{ camera }} - Video Footage"
