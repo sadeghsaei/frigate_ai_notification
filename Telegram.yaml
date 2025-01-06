@@ -1,5 +1,5 @@
 blueprint:
-  name: Frigate Notifications (telegram-01)
+  name: Frigate Notifications (telegram-03)
   author: sadeghsaei
   homeassistant:
     min_version: 2024.6.0
@@ -21,13 +21,6 @@ blueprint:
           integration: frigate
           domain: camera
           device_class: camera
-    notify_device:
-      name: Mobile Device
-      description: Select a device that runs the official Home Assistant app to receive notifications. If you wish to notify a group of devices and/or Android/Fire TV use the field below to override this selection. This will be ignored in that case but is still required.
-      default: false
-      selector:
-        device:
-          integration: mobile_app
     base_url:
       name: Base URL (Optional)
       description: |
@@ -322,12 +315,6 @@ variables:
   input_client_id: !input client_id
   client_id: "{{input_client_id if not input_client_id else '/' + input_client_id if '/' not in input_client_id else input_client_id }}"
   attachment: !input attachment
-  alert_once: !input alert_once
-  update_thumbnail: !input update_thumbnail
-  ios_live_view: !input ios_live_view
-  android_auto: !input android_auto
-  notify_group: !input notify_group
-  notify_group_target: "{{ notify_group | lower | regex_replace('^notify\\.', '') | replace(' ','_') }}"
   zone_only: !input zone_filter
   input_zones: !input zones
   zones: "{{ input_zones }}"
@@ -389,23 +376,9 @@ action:
               # Customisation of text
               title: !input title
               message: !input message
-              subtitle: !input subtitle
-              tap_action: !input tap_action
-              button_1: !input button_1
-              button_2: !input button_2
-              button_3: !input button_3
-              url_1: !input url_1
-              url_2: !input url_2
-              url_3: !input url_3
-              icon_1: !input icon_1
-              icon_2: !input icon_2
-              icon_3: !input icon_3
               # other things that can be templated and might need info from the event
-              critical_input: !input critical
-              critical: "{{ true if critical_input == 'true' else true if critical_input == True else false }}"
               custom_filter: !input custom_filter
               icon: !input icon
-              group: !input group
               channel: !input channel
               video: !input video
               custom_action_auto: !input custom_action_auto
