@@ -1,5 +1,5 @@
 blueprint:
-  name: Frigate Notifications (telegram-05)
+  name: Frigate Notifications (telegram-06)
   author: sadeghsaei
   homeassistant:
     min_version: 2024.6.0
@@ -295,16 +295,6 @@ trigger:
     payload: "{{ camera }}/new"
     value_template: "{{ value_json['after']['camera'] | lower | replace('-','_') }}/{{ value_json['type']}}"
     id: frigate-event
-  - platform: event
-    event_type: mobile_app_notification_action
-    event_data:
-      action: "silence-{{ camera }}"
-    id: silence
-  - platform: event
-    event_type: mobile_app_notification_action
-    event_data:
-      action: "custom-{{ camera }}"
-    id: custom
 variables:
   ai_prompt: !input aiprompt
   input_camera: !input camera
@@ -335,21 +325,6 @@ variables:
 
 action:
   - choose:
-      - alias: "Silence New Object Notifications"
-        conditions:
-          - condition: trigger
-            id: silence
-        sequence:
-          - service: automation.turn_off
-            target:
-              entity_id: "{{ this.entity_id }}"
-            data:
-              stop_actions: false
-          - delay:
-              minutes: !input silence_timer
-          - service: automation.turn_on
-            target:
-              entity_id: "{{ this.entity_id }}"
       - alias: "Frigate Event"
         conditions:
           - condition: trigger
@@ -373,9 +348,6 @@ action:
               message: !input message
               # other things that can be templated and might need info from the event
               custom_filter: !input custom_filter
-          - alias: "Notifications enabled for object label"
-            condition: template
-            value_template: "{{ not labels|length or object in labels }}"
           - alias: "Delay for image"
             choose:
               - conditions:
