@@ -1,5 +1,5 @@
 blueprint:
-  name: Frigate Notifications (telegram-04)
+  name: Frigate Notifications (telegram-05)
   author: sadeghsaei
   homeassistant:
     min_version: 2024.6.0
@@ -32,6 +32,10 @@ blueprint:
       name: MQTT Topic (Advanced)
       description: The MQTT topic Frigate sends messages in.
       default: frigate/events
+    client_id:
+      name: Client ID (Optional-Advanced)
+      description: Used to support multiple instances of Frigate. Leave blank if you don't know what to do.
+      default: ""
     notification_customisations:
       name: |
         # Notification Customisations
@@ -346,11 +350,6 @@ action:
           - service: automation.turn_on
             target:
               entity_id: "{{ this.entity_id }}"
-      - alias: "Custom Action Manual"
-        conditions:
-          - condition: trigger
-            id: custom
-        sequence: !input "custom_action_manual"
       - alias: "Frigate Event"
         conditions:
           - condition: trigger
@@ -374,10 +373,6 @@ action:
               message: !input message
               # other things that can be templated and might need info from the event
               custom_filter: !input custom_filter
-              icon: !input icon
-              channel: !input channel
-              video: !input video
-              custom_action_auto: !input custom_action_auto
           - alias: "Notifications enabled for object label"
             condition: template
             value_template: "{{ not labels|length or object in labels }}"
@@ -388,15 +383,6 @@ action:
                 sequence:
                   - delay:
                       seconds: "{{initial_delay}}"
-          - alias: "Custom Action Auto"
-            choose:
-              - conditions:
-                  - "{{ custom_action_auto |length > 0 }}"
-                  - "{{ not zone_only or (not zone_multi and zones|select('in', enteredzones)|list|length > 0) or (zone_multi and enteredzones|length > 0 and zones |reject('in', enteredzones) |list |length == 0) }}"
-                  - "{{ not initial_home }}"
-                  - "{{ not state_only or states(input_entity)|lower in states_filter }}"
-                sequence: !input "custom_action_auto"
-
           #- alias: "Telegram Normal Image"
           #  action: telegram_bot.send_photo
           #  data:
