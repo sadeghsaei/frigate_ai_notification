@@ -345,18 +345,7 @@ variables:
   input_entity: !input state_entity
   input_states: !input state_filter_states
   states_filter: "{{ input_states | list | lower }}"
-  color: !input color
-  sound: !input sound
-  input_volume: !input volume
-  volume: "{{ (1 * input_volume|int(100))/100 }}"
-  sticky: !input sticky
-  tv: !input tv
-  tv_position: !input tv_position
-  tv_size: !input tv_size
-  tv_duration: !input tv_duration
-  tv_transparency: !input tv_transparency
-  tv_interrupt: !input tv_interrupt
-  debug: !input debug
+
 action:
   - choose:
       - alias: "Silence New Object Notifications"
