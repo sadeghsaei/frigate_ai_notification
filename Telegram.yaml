@@ -1,5 +1,5 @@
 blueprint:
-  name: Frigate Notifications (telegram-03)
+  name: Frigate Notifications (telegram-04)
   author: sadeghsaei
   homeassistant:
     min_version: 2024.6.0
@@ -25,7 +25,6 @@ blueprint:
       name: Base URL (Optional)
       description: |
         The external URL for your Home Assistant instance. 
-        Recommended for iOS and required for Android/Fire TV.
         Must include the scheme i.e http:// or https://
         Examples: http://192.168.1.25:8123   https://homeassistant.mydomain.com
       default: ""
@@ -78,8 +77,6 @@ blueprint:
           name: Attachment
           description: |
             Choose which image to attach to the notification.
-
-            Note: TVs will always get sent the snapshot if TV is true
           default: thumbnail.jpg
           selector:
             select:
@@ -311,7 +308,6 @@ variables:
   camera_name: "{{ camera | replace('_', ' ') | title }}"
   input_base_url: !input base_url
   base_url: "{{ input_base_url.rstrip('/')}}"
-  update_sub_label: !input update_sub_label
   input_client_id: !input client_id
   client_id: "{{input_client_id if not input_client_id else '/' + input_client_id if '/' not in input_client_id else input_client_id }}"
   attachment: !input attachment
