@@ -1,5 +1,5 @@
 blueprint:
-  name: Frigate Notifications (telegram-07)
+  name: Frigate Notifications (telegram-08)
   author: sadeghsaei
   homeassistant:
     min_version: 2024.6.0
@@ -7,7 +7,7 @@ blueprint:
     ## Frigate Notifications
 
   domain: automation
-  source_url: https://github.com/sadeghsaei/frigate_ai_notification/blob/main/universal.yaml
+  source_url: https://github.com/sadeghsaei/frigate_ai_notification/blob/main/Telegraml.yaml
   input:
     camera:
       name: Frigate Camera
@@ -81,7 +81,7 @@ blueprint:
           name: Attachment
           description: |
             Choose which image to attach to the notification.
-          default: thumbnail.jpg
+          default: snapshot.jpg?bbox=1
           selector:
             select:
               options:
