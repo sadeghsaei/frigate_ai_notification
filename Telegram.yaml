@@ -1,5 +1,5 @@
 blueprint:
-  name: Frigate Notifications (telegram-12)
+  name: Frigate Notifications (telegram-13)
   author: sadeghsaei
   homeassistant:
     min_version: 2024.6.0
@@ -351,7 +351,7 @@ action:
           - alias: "Notify on new object"
             choose:
               - conditions:
-                  - "{{ zone_only or (zone_multi and zones|select('in', enteredzones)|list|length > 0) or (zone_multi and enteredzones|length > 0 and zones |reject('in', enteredzones) |list |length == 0) }}"
+                  - "{{ not zone_only or (not zone_multi and zones|select('in', enteredzones)|list|length > 0) or (zone_multi and enteredzones|length > 0 and zones |reject('in', enteredzones) |list |length == 0) }}"
                   - "{{ not initial_home }}"
                   - "{{ not state_only or states(input_entity)|lower in states_filter }}"
                   - "{{ custom_filter }}"
