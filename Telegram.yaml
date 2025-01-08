@@ -1,78 +1,10 @@
 blueprint:
-  name: Frigate Notifications (telegram-14)
+  name: Frigate Notifications (telegram-15)
   author: SgtBatten
   homeassistant:
     min_version: 2024.6.0
   description: |
     ## Frigate Notifications
-
-    This blueprint will send a notification to your device when a Frigate event for the selected camera is fired. The notification will initially include the thumbnail of the detection, but include an actionable notification allowing you to view the clip and snapshot.
-
-    With this blueprint, you may send the notification to multiple devices by leaving "Device" blank and instead use a [notification group][1].
-
-    ### Software Version Requirements
-      - Minimum Home Assistant Version: 2022.2
-      - Minimum Frigate Version: 0.11.0
-      - Minimum Frigate Integration Version: 3.0.0
-        - **Note:** "Enable the unauthenticated notification event proxy" must be ticked during setup
-      - An MQTT broker connected to Home Assistant and Frigate.
-      - Minimum iOS Version: 15.0
-
-    ### Required entities:
-      - Frigate Camera Name
-      - Mobile Device (Running HA Companion App)
-
-    ### Features:
-      - Easily select the camera entity or mobile device using a drop-down menu.
-      - Send notifications to an Android or iOS mobile device or a TV.
-        - or a group containing any combination of the above.
-        - for TV Alerts, you need to install and configure https://www.home-assistant.io/integrations/nfandroidtv/
-      - Configure the title and message of the notification. 
-      - Dynamically handle things like object type, zones, and face detection from doubletake.
-      - Automatically handle some common errors like case matching and bad URLs etc.
-      - Optionally send the notification as a critical alert. (Critical)
-      - Optionally limit playing audio for secondary notification updates, and on iOS, customise the sound. (Alert Once)
-      - Choose whether or not to update the notification with new thumbnails as they become available.
-      - Customise the notification colour and icon.
-      - Optionally send a live view to iOS.
-      - Configure custom notification channels on Android.
-      - Specify which [zones][2] to be notified about. (Zone Filter)
-        - Choose between enforcing all required zones simultaneously or any one zone.
-      - Specify what type of [objects][3] to be notified about. (Object Filter)
-      - Disable notifications if a presence entity or group is "home". (Presence Filter)
-      - Limit notifications based on the state of another entity. (State Filter)
-      - Limit notifications to certain hours of the day. (Time Filter)
-      - Configure a cooldown for the camera to reduce the number of notifications when back-to-back events occur.
-      - Silence future notifications for a defined amount of time through actionable notifications. This is helpful in situations where you know you will be triggering detections for an extended period of time. i.e. kids playing outside.
-      - Set a loitering timer to notify you of stationary objects that remain for a set time.
-      - Configure what happens when you tap the notification. (Tap Action)
-      - Configure 3 action buttons to open almost anything. (defaults are: View Clip, View Snapshot, and Silence New Notifications)
-      - Configure the size, transparency, position, and duration of TV notifications.
-      - Debug option to help with troubleshooting.
-      - Support for multiple Frigate instances by specifying the ClientID and MQTT topic.
-      - Optional delay to the initial notification to see if it resolves the no attached image issue.
-      - Live view on iOS.
-      - Android option: Sticky as per https://community.home-assistant.io/t/frigate-mobile-app-notifications/311091/1043
-      - Add 5s delay to the final notification update to ensure Frigate has time to save snapshot edits (crop, bounding box, etc.) if "update thumbnail" is enabled. 
-      - Add Video (gif) option to Android which will be sent 5 seconds after the event ends.
-      - Subtitle support.
-      - Video for iOS sent 5 seconds after the event ends.
-      - Set custom entity for iOS live view.
-      - Set Icons for Action Buttons on iOS.
-      - Strip trailing underscores and numbers from the camera name. (This will break automation for anyone whose Frigate cam ends in _x.)
-      - Android Auto option.
-      - Custom Filter.
-      - Customise group on mobile devices.
-      - Bounding box and crop options for attachment.
-      - Set notification volume on iOS
-      - Integrates with Double Take to replace object labels with names if a face is matched.
-
-    [1]: https://companion.home-assistant.io/docs/notifications/notifications-basic#sending-notifications-to-multiple-devices
-    [2]: https://blakeblackshear.github.io/frigate/configuration/cameras#zones
-    [3]: https://blakeblackshear.github.io/frigate/configuration/objects
-
-    ## Support
-    Go to https://github.com/SgtBatten/HA_blueprints to report bugs, request new features, or get support with your configuration.
 
   domain: automation
   source_url: https://github.com/SgtBatten/HA_blueprints/blob/main/Frigate_Camera_Notifications/Stable.yaml
@@ -130,6 +62,11 @@ blueprint:
         title:
           name: Notification Title (Optional)
           description: The title of the notification.
+
+          default: ""
+        aiprompt:
+          name: AI prompt
+          description: The prompt to send to Gemini.
 
           default: ""
         message:
@@ -802,6 +739,7 @@ trigger:
       action: "custom-{{ camera }}"
     id: custom
 variables:
+  ai_prompt: !input aiprompt
   input_camera: !input camera
   camera: "{{ input_camera | regex_replace('^camera\\.', '') }}"
   camera_name: "{{ camera | replace('_', ' ') | title }}"
@@ -946,8 +884,8 @@ action:
                       - delay:
                           hours: 0
                           minutes: 0
-                          seconds: 0
-                          milliseconds: 700
+                          seconds: 2
+                          milliseconds: 
                         enabled: true
                       - data:
                           filename: /config/www/tmp/snapshot-{{ camera }}-2.jpg
@@ -958,8 +896,8 @@ action:
                       - delay:
                           hours: 0
                           minutes: 0
-                          seconds: 0
-                          milliseconds: 700
+                          seconds: 1
+                          milliseconds: 100
                         enabled: true
                       - data:
                           filename: /config/www/tmp/snapshot-{{ camera }}-3.jpg
@@ -970,8 +908,8 @@ action:
                       - delay:
                           hours: 0
                           minutes: 0
-                          seconds: 0
-                          milliseconds: 700
+                          seconds: 1
+                          milliseconds: 100
                         enabled: true
                       - data:
                           filename: /config/www/tmp/snapshot-{{ camera }}-4.jpg
