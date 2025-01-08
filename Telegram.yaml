@@ -1,5 +1,5 @@
 blueprint:
-  name: Frigate Notifications (telegram-10)
+  name: Frigate Notifications (telegram-11)
   author: sadeghsaei
   homeassistant:
     min_version: 2024.6.0
@@ -332,10 +332,6 @@ action:
           - "{{ is_state(this.entity_id, 'on') }}"
           - "{{ not this.attributes.last_triggered or (now() - this.attributes.last_triggered).seconds > cooldown }}"
           - "{{ not disable_times|length or not now().hour in disable_times|map('int')|list }}"
-          - "{{ not zone_only or (not zone_multi and zones|select('in', enteredzones)|list|length > 0) or (zone_multi and enteredzones|length > 0 and zones |reject('in', enteredzones) |list |length == 0) }}"
-          - "{{ not initial_home }}"
-          - "{{ not state_only or states(input_entity)|lower in states_filter }}"
-          - "{{ custom_filter }}"
         sequence:
           - variables:
               event: "{{ trigger.payload_json }}"
@@ -352,89 +348,97 @@ action:
               message: !input message
               # other things that can be templated and might need info from the event
               custom_filter: !input custom_filter
-          - alias: "Delay for image"
+          - alias: "Notify on new object"
             choose:
               - conditions:
-                  - "{{initial_delay > 0}}"
+                  - "{{ not zone_only or (not zone_multi and zones|select('in', enteredzones)|list|length > 0) or (zone_multi and enteredzones|length > 0 and zones |reject('in', enteredzones) |list |length == 0) }}"
+                  - "{{ not initial_home }}"
+                  - "{{ not state_only or states(input_entity)|lower in states_filter }}"
+                  - "{{ custom_filter }}"
                 sequence:
-                  - delay:
-                      seconds: "{{initial_delay}}"
-          #- alias: "Telegram Normal Image"
-          #  action: telegram_bot.send_photo
-          #  data:
-          #    url: "{{base_url}}/api/frigate{{client_id}}/notifications/{{id}}/{{attachment}}{{'&' if '?' in attachment else '?'}}format=android"
-          #    caption: "{{message}}"
-          - alias: "Send Photos to Google Gemini"
-            sequence:
-              - data:
-                  filename: /config/www/tmp/snapshot-{{ camera }}-1.jpg
-                target:
-                  entity_id: '{{ input_camera }}'
-                enabled: true
-                action: camera.snapshot
-              - delay:
-                  hours: 0
-                  minutes: 0
-                  seconds: 0
-                  milliseconds: 700
-                enabled: true
-              - data:
-                  filename: /config/www/tmp/snapshot-{{ camera }}-2.jpg
-                target:
-                  entity_id: '{{ input_camera }}'
-                enabled: true
-                action: camera.snapshot
-              - delay:
-                  hours: 0
-                  minutes: 0
-                  seconds: 0
-                  milliseconds: 700
-                enabled: true
-              - data:
-                  filename: /config/www/tmp/snapshot-{{ camera }}-3.jpg
-                target:
-                  entity_id: '{{ input_camera }}'
-                enabled: true
-                action: camera.snapshot
-              - delay:
-                  hours: 0
-                  minutes: 0
-                  seconds: 0
-                  milliseconds: 700
-                enabled: true
-              - data:
-                  filename: /config/www/tmp/snapshot-{{ camera }}-4.jpg
-                target:
-                  entity_id: '{{ input_camera }}'
-                enabled: true
-                action: camera.snapshot
-              - metadata: {}
-                data:
-                  prompt: '{{ai_prompt}}'
-                  image_filename:
-                    - /config/www/tmp/snapshot-{{ camera }}-1.jpg
-                    - /config/www/tmp/snapshot-{{ camera }}-2.jpg
-                    - /config/www/tmp/snapshot-{{ camera }}-3.jpg
-                    - /config/www/tmp/snapshot-{{ camera }}-4.jpg
-                response_variable: generated_content
-                action: google_generative_ai_conversation.generate_content
-              - delay:
-                  hours: 0
-                  minutes: 0
-                  seconds: 1
-                  milliseconds: 0
-                enabled: true
-          - alias: "Telegram Image and AI Description"
-            action: telegram_bot.send_photo
-            data:
-              url: "{{base_url}}/api/frigate{{client_id}}/notifications/{{id}}/{{attachment}}{{'&' if '?' in attachment else '?'}}format=android"
-              caption: "{{ camera }} - {{generated_content.text}}"
-          - alias: "Delay for video to be Ready"
-            sequence:
-              - delay:
-                  seconds: 10
-          - alias: "Telegram AI Video"
-            action: telegram_bot.send_video
-            data:
-              url: "{{base_url}}/api/frigate{{client_id}}/notifications/{{id}}/{{camera + '/clip.mp4'}}"
-              caption: "{{ camera }} - Video Footage"
+                  - alias: "Delay for image"
+                    choose:
+                      - conditions:
+                          - "{{initial_delay > 0}}"
+                        sequence:
+                          - delay:
+                              seconds: "{{initial_delay}}"
+                  #- alias: "Telegram Normal Image"
+                  #  action: telegram_bot.send_photo
+                  #  data:
+                  #    url: "{{base_url}}/api/frigate{{client_id}}/notifications/{{id}}/{{attachment}}{{'&' if '?' in attachment else '?'}}format=android"
+                  #    caption: "{{message}}"
+                  - alias: "Send Photos to Google Gemini"
+                    sequence:
+                      - data:
+                          filename: /config/www/tmp/snapshot-{{ camera }}-1.jpg
+                        target:
+                          entity_id: '{{ input_camera }}'
+                        enabled: true
+                        action: camera.snapshot
+                      - delay:
+                          hours: 0
+                          minutes: 0
+                          seconds: 0
+                          milliseconds: 700
+                        enabled: true
+                      - data:
+                          filename: /config/www/tmp/snapshot-{{ camera }}-2.jpg
+                        target:
+                          entity_id: '{{ input_camera }}'
+                        enabled: true
+                        action: camera.snapshot
+                      - delay:
+                          hours: 0
+                          minutes: 0
+                          seconds: 0
+                          milliseconds: 700
+                        enabled: true
+                      - data:
+                          filename: /config/www/tmp/snapshot-{{ camera }}-3.jpg
+                        target:
+                          entity_id: '{{ input_camera }}'
+                        enabled: true
+                        action: camera.snapshot
+                      - delay:
+                          hours: 0
+                          minutes: 0
+                          seconds: 0
+                          milliseconds: 700
+                        enabled: true
+                      - data:
+                          filename: /config/www/tmp/snapshot-{{ camera }}-4.jpg
+                        target:
+                          entity_id: '{{ input_camera }}'
+                        enabled: true
+                        action: camera.snapshot
+                      - metadata: {}
+                        data:
+                          prompt: '{{ai_prompt}}'
+                          image_filename:
+                            - /config/www/tmp/snapshot-{{ camera }}-1.jpg
+                            - /config/www/tmp/snapshot-{{ camera }}-2.jpg
+                            - /config/www/tmp/snapshot-{{ camera }}-3.jpg
+                            - /config/www/tmp/snapshot-{{ camera }}-4.jpg
+                        response_variable: generated_content
+                        action: google_generative_ai_conversation.generate_content
+                      - delay:
+                          hours: 0
+                          minutes: 0
+                          seconds: 1
+                          milliseconds: 0
+                        enabled: true
+                  - alias: "Telegram Image and AI Description"
+                    action: telegram_bot.send_photo
+                    data:
+                      url: "{{base_url}}/api/frigate{{client_id}}/notifications/{{id}}/{{attachment}}{{'&' if '?' in attachment else '?'}}format=android"
+                      caption: "{{ camera }} - {{generated_content.text}}"
+                  - alias: "Delay for video to be Ready"
+                    sequence:
+                      - delay:
+                          seconds: 10
+                  - alias: "Telegram AI Video"
+                    action: telegram_bot.send_video
+                    data:
+                      url: "{{base_url}}/api/frigate{{client_id}}/notifications/{{id}}/{{camera + '/clip.mp4'}}"
+                      caption: "{{ camera }} - Video Footage"
