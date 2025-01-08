@@ -1,5 +1,5 @@
 blueprint:
-  name: Frigate Notifications (telegram-09)
+  name: Frigate Notifications (telegram-10)
   author: sadeghsaei
   homeassistant:
     min_version: 2024.6.0
@@ -331,7 +331,7 @@ action:
             id: "frigate-event"
           - "{{ is_state(this.entity_id, 'on') }}"
           - "{{ not this.attributes.last_triggered or (now() - this.attributes.last_triggered).seconds > cooldown }}"
-          - "{{ not disable_times|length or not now().hour in disable_times|map('int')|list }}" and
+          - "{{ not disable_times|length or not now().hour in disable_times|map('int')|list }}"
           - "{{ not zone_only or (not zone_multi and zones|select('in', enteredzones)|list|length > 0) or (zone_multi and enteredzones|length > 0 and zones |reject('in', enteredzones) |list |length == 0) }}"
           - "{{ not initial_home }}"
           - "{{ not state_only or states(input_entity)|lower in states_filter }}"
