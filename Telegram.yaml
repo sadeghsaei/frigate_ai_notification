@@ -1,5 +1,5 @@
 blueprint:
-  name: Frigate Notifications (telegram-15)
+  name: Frigate Notifications (telegram-16)
   author: SgtBatten
   homeassistant:
     min_version: 2024.6.0
@@ -885,7 +885,7 @@ action:
                           hours: 0
                           minutes: 0
                           seconds: 2
-                          milliseconds: 
+                          milliseconds: 0
                         enabled: true
                       - data:
                           filename: /config/www/tmp/snapshot-{{ camera }}-2.jpg
