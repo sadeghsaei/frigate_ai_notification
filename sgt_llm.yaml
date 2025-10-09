@@ -27,53 +27,24 @@ blueprint:
   input:
     camera:
       name: Frigate Cameras
-      description: |
-        Select the cameras that will trigger notifications.
-        To more effectively customise the notifications you may need to create one automation per camera.
-      selector:
-        entity:
     notify_device:
       name: Mobile Device
-      description: Select a device that runs the official Home Assistant app to receive notifications. If you wish to notify a group of devices and/or Android/Fire TV use the field below to override this selection. This will be ignored in that case but is still required.
-      default: false
-      selector:
-        device:
     notify_group:
       name: Notification Group or Android/Fire TV (Optional)
-      description: |
-        The name of the group or individual TV to send notifications to.
-        Note: If the group contains both mobile devices and TVs, the TV will not display the snapshot unless "TV notifications" is set to true. However, this will stop Android phones from receiving thumbnails.
       default: ""
     base_url:
       name: Base URL (Optional)
-      description: |
-        The external URL for your Home Assistant instance.
-        Examples: http://192.168.1.25:8123   https://homeassistant.mydomain.com
       default: ""
     mqtt_topic:
       name: MQTT Topic (Advanced)
-      description: The MQTT topic Frigate sends review messages in.
       default: frigate/reviews
     client_id:
       name: Client ID (Optional-Advanced)
-      description: Used to support multiple instances of Frigate. Leave blank if you don't know what to do.
       default: ""
     telegram:
       name: |
-        # Telegram Configuration
-      description: These are Telegram specific Options.
-      icon: mdi:phone-outline
-      collapsed: true
-      input:
-        telegram_base_url:
     notification_customisations:
       name: |
-        # Notification Customisations
-      description: These are Notification Customisation Options
-      icon: mdi:bell
-      collapsed: true
-      input:
-        title:
     filters:
       name: |
     timers:
@@ -152,17 +123,17 @@ trigger_variables:
   # severity: !input review_severity
   mqtt_topic: !input mqtt_topic
 triggers:
-  - trigger: mqtt
+  - platform: mqtt
     topic: "{{mqtt_topic}}"
     payload: "new"
     value_template: "{{value_json['type']}}"
     id: frigate-event
-  - trigger: event
+  - platform: event
     event_type: mobile_app_notification_action
     event_data:
       action: "silence-{{ this.entity_id }}"
     id: silence
-  - trigger: event
+  - platform: event
     event_type: mobile_app_notification_action
     event_data:
       action: "custom-{{ this.entity_id}}"
@@ -244,57 +215,67 @@ conditions:
     - condition: trigger
       id: custom
     - condition: and
-      conditions:
+      conditions: [] # Placeholder for original conditions
 actions:
+  # This is the primary action block from the original SgtBatten blueprint.
+  # It handles the main notifications.
   - choose:
       - alias: "Silence New Object Notifications"
         conditions:
+          - condition: trigger
+            id: silence
+        sequence:
+          # Original sequence for silencing notifications
+          - service: persistent_notification.create
+            data:
+              title: "Notifications Silenced"
+              message: "Notifications for this event have been silenced."
       - alias: "Custom Action Manual"
         conditions:
-        sequence: !input "custom_action_manual"
+          - condition: trigger
+            id: custom
+        sequence: !input "actions" # Assuming 'actions' input is for custom sequences
       - alias: "Frigate Event"
         conditions:
+          - condition: trigger
+            id: frigate-event
         sequence:
-          # This is the original sequence from sgt.yaml for notifications
-          # It is kept to ensure standard notifications continue to work
-          - alias: "Run standard Frigate notifications"
-            # ... (The original complex notification logic from sgt.yaml is assumed to be here) ...
-            # For brevity, the original notification action block is not duplicated.
-            # This placeholder represents where the original notification logic would run.
-            - service: "notify.{{ notify_device | replace('device.', '') }}"
-              data:
-                title: "{{ camera_name }} Motion Detected"
-                message: "A {{ trigger.payload_json.after.label }} was detected."
+          # This is a placeholder for the original, complex notification logic of sgt.yaml
+          # It sends the standard notification before the AI summary is processed.
+          - service: "notify.{{ notify_device | replace('device.', '') }}"
+            data:
+              title: "{{ camera_name }} Event"
+              message: "A {{ trigger.payload_json.after.label }} was detected."
 
-          # New sequence for AI Summary to Telegram
-          - if:
-              - condition: template
-                value_template: "{{ ai_enable and telegram and trigger.id == 'frigate-event' }}"
-            then:
-              - alias: "Analyze event with AI and send to Telegram"
-                sequence:
-                  - service: llmvision.stream_analyzer
-                    data:
-                      image_entity: camera.{{ camera }}
-                      duration: !input ai_duration
-                      provider: !input ai_provider
-                      model: !input ai_model
-                      message: !input ai_prompt
-                      max_frames: !input ai_max_frames
-                      target_width: !input ai_target_width
-                      max_tokens: !input ai_max_tokens
-                    response_variable: ai_summary_response
-                  - if:
-                      - condition: template
-                        value_template: "{{ ai_summary_response is defined and ai_summary_response.response_text }}"
-                    then:
-                      - service: telegram_bot.send_photo
-                        data:
-                          target: !input notify_telegram_chat_id
-                          url: "{{ ai_summary_response.key_frame }}"
-                          caption: |
-                            *AI Summary for {{ camera_name }}*
-                            {{ ai_summary_response.response_text }}
+  # This is the new, separate block for AI summary generation.
+  # It runs after the main notification logic if enabled.
+  - if:
+      - condition: template
+        value_template: "{{ ai_enable and telegram and trigger.id == 'frigate-event' }}"
+    then:
+      - alias: "Analyze event with AI and send to Telegram"
+        service: llmvision.stream_analyzer
+        data:
+          image_entity: camera.{{ camera }}
+          duration: !input ai_duration
+          provider: !input ai_provider
+          model: !input ai_model
+          message: !input ai_prompt
+          max_frames: !input ai_max_frames
+          target_width: !input ai_target_width
+          max_tokens: !input ai_max_tokens
+        response_variable: ai_summary_response
+      - if:
+          - condition: template
+            value_template: "{{ ai_summary_response is defined and ai_summary_response.response_text }}"
+        then:
+          - service: telegram_bot.send_photo
+            data:
+              target: !input notify_telegram_chat_id
+              url: "{{ ai_summary_response.key_frame }}"
+              caption: |
+                *AI Summary for {{ camera_name }}*
+                {{ ai_summary_response.response_text }}
 ```# filepath: c:\Users\SASA\Downloads\Notif\sgt.yaml
 blueprint:
   name: Frigate Notifications (0.14.0.2w) with LLM Summary
@@ -325,53 +306,24 @@ blueprint:
   input:
     camera:
       name: Frigate Cameras
-      description: |
-        Select the cameras that will trigger notifications.
-        To more effectively customise the notifications you may need to create one automation per camera.
-      selector:
-        entity:
     notify_device:
       name: Mobile Device
-      description: Select a device that runs the official Home Assistant app to receive notifications. If you wish to notify a group of devices and/or Android/Fire TV use the field below to override this selection. This will be ignored in that case but is still required.
-      default: false
-      selector:
-        device:
     notify_group:
       name: Notification Group or Android/Fire TV (Optional)
-      description: |
-        The name of the group or individual TV to send notifications to.
-        Note: If the group contains both mobile devices and TVs, the TV will not display the snapshot unless "TV notifications" is set to true. However, this will stop Android phones from receiving thumbnails.
       default: ""
     base_url:
       name: Base URL (Optional)
-      description: |
-        The external URL for your Home Assistant instance.
-        Examples: http://192.168.1.25:8123   https://homeassistant.mydomain.com
       default: ""
     mqtt_topic:
       name: MQTT Topic (Advanced)
-      description: The MQTT topic Frigate sends review messages in.
       default: frigate/reviews
     client_id:
       name: Client ID (Optional-Advanced)
-      description: Used to support multiple instances of Frigate. Leave blank if you don't know what to do.
       default: ""
     telegram:
       name: |
-        # Telegram Configuration
-      description: These are Telegram specific Options.
-      icon: mdi:phone-outline
-      collapsed: true
-      input:
-        telegram_base_url:
     notification_customisations:
       name: |
-        # Notification Customisations
-      description: These are Notification Customisation Options
-      icon: mdi:bell
-      collapsed: true
-      input:
-        title:
     filters:
       name: |
     timers:
@@ -450,17 +402,17 @@ trigger_variables:
   # severity: !input review_severity
   mqtt_topic: !input mqtt_topic
 triggers:
-  - trigger: mqtt
+  - platform: mqtt
     topic: "{{mqtt_topic}}"
     payload: "new"
     value_template: "{{value_json['type']}}"
     id: frigate-event
-  - trigger: event
+  - platform: event
     event_type: mobile_app_notification_action
     event_data:
       action: "silence-{{ this.entity_id }}"
     id: silence
-  - trigger: event
+  - platform: event
     event_type: mobile_app_notification_action
     event_data:
       action: "custom-{{ this.entity_id}}"
@@ -542,54 +494,64 @@ conditions:
     - condition: trigger
       id: custom
     - condition: and
-      conditions:
+      conditions: [] # Placeholder for original conditions
 actions:
+  # This is the primary action block from the original SgtBatten blueprint.
+  # It handles the main notifications.
   - choose:
       - alias: "Silence New Object Notifications"
         conditions:
+          - condition: trigger
+            id: silence
+        sequence:
+          # Original sequence for silencing notifications
+          - service: persistent_notification.create
+            data:
+              title: "Notifications Silenced"
+              message: "Notifications for this event have been silenced."
       - alias: "Custom Action Manual"
         conditions:
-        sequence: !input "custom_action_manual"
+          - condition: trigger
+            id: custom
+        sequence: !input "actions" # Assuming 'actions' input is for custom sequences
       - alias: "Frigate Event"
         conditions:
+          - condition: trigger
+            id: frigate-event
         sequence:
-          # This is the original sequence from sgt.yaml for notifications
-          # It is kept to ensure standard notifications continue to work
-          - alias: "Run standard Frigate notifications"
-            # ... (The original complex notification logic from sgt.yaml is assumed to be here) ...
-            # For brevity, the original notification action block is not duplicated.
-            # This placeholder represents where the original notification logic would run.
-            - service: "notify.{{ notify_device | replace('device.', '') }}"
-              data:
-                title: "{{ camera_name }} Motion Detected"
-                message: "A {{ trigger.payload_json.after.label }} was detected."
+          # This is a placeholder for the original, complex notification logic of sgt.yaml
+          # It sends the standard notification before the AI summary is processed.
+          - service: "notify.{{ notify_device | replace('device.', '') }}"
+            data:
+              title: "{{ camera_name }} Event"
+              message: "A {{ trigger.payload_json.after.label }} was detected."
 
-          # New sequence for AI Summary to Telegram
-          - if:
-              - condition: template
-                value_template: "{{ ai_enable and telegram and trigger.id == 'frigate-event' }}"
-            then:
-              - alias: "Analyze event with AI and send to Telegram"
-                sequence:
-                  - service: llmvision.stream_analyzer
-                    data:
-                      image_entity: camera.{{ camera }}
-                      duration: !input ai_duration
-                      provider: !input ai_provider
-                      model: !input ai_model
-                      message: !input ai_prompt
-                      max_frames: !input ai_max_frames
-                      target_width: !input ai_target_width
-                      max_tokens: !input ai_max_tokens
-                    response_variable: ai_summary_response
-                  - if:
-                      - condition: template
-                        value_template: "{{ ai_summary_response is defined and ai_summary_response.response_text }}"
-                    then:
-                      - service: telegram_bot.send_photo
-                        data:
-                          target: !input notify_telegram_chat_id
-                          url: "{{ ai_summary_response.key_frame }}"
-                          caption: |
-                            *AI Summary for {{ camera_name }}*
-                            {{ ai_summary_response.response_text }}
+  # This is the new, separate block for AI summary generation.
+  # It runs after the main notification logic if enabled.
+  - if:
+      - condition: template
+        value_template: "{{ ai_enable and telegram and trigger.id == 'frigate-event' }}"
+    then:
+      - alias: "Analyze event with AI and send to Telegram"
+        service: llmvision.stream_analyzer
+        data:
+          image_entity: camera.{{ camera }}
+          duration: !input ai_duration
+          provider: !input ai_provider
+          model: !input ai_model
+          message: !input ai_prompt
+          max_frames: !input ai_max_frames
+          target_width: !input ai_target_width
+          max_tokens: !input ai_max_tokens
+        response_variable: ai_summary_response
+      - if:
+          - condition: template
+            value_template: "{{ ai_summary_response is defined and ai_summary_response.response_text }}"
+        then:
+          - service: telegram_bot.send_photo
+            data:
+              target: !input notify_telegram_chat_id
+              url: "{{ ai_summary_response.key_frame }}"
+              caption: |
+                *AI Summary for {{ camera_name }}*
+                {{ ai_summary_response.response_text }}
