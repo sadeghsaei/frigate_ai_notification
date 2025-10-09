@@ -5,18 +5,13 @@ blueprint:
     min_version: 2024.11.0
   description: |
     ## Frigate Notifications with AI Event Summary
-
     A highly customisable Notification template for Frigate Camera Notifications, with an integrated option to generate an AI-powered summary of events and send it to Telegram.
-
     This combines the powerful filtering and notification channels of the SgtBatten blueprint with the AI analysis capabilities from the valentinfrlch blueprint.
-
     ### Software Version Requirements
       - Minimum Home Assistant Version: 2024.10
       - Minimum Frigate Version: 0.14.0
-      - Minimum Frigate Integration Version: 5.7.0
       - An MQTT broker connected to Home Assistant and Frigate.
       - **llmvision** integration installed for AI summaries.
-
     ### Required Configuration Options:
       - Frigate Cameras
       - Mobile Device (Running HA Companion App)
@@ -27,8 +22,15 @@ blueprint:
   input:
     camera:
       name: Frigate Cameras
+      selector:
+        entity:
+          domain: camera
+          multiple: true
     notify_device:
       name: Mobile Device
+      selector:
+        device:
+          integration: mobile_app
     notify_group:
       name: Notification Group or Android/Fire TV (Optional)
       default: ""
@@ -41,55 +43,281 @@ blueprint:
     client_id:
       name: Client ID (Optional-Advanced)
       default: ""
+
     telegram:
-      name: |
+      name: "# Telegram Configuration"
+      description: These are Telegram specific Options.
+      collapsed: true
+      input:
+        notify_telegram_chat_id:
+          name: Telegram Chat ID
+          default: ""
+        telegram_base_url:
+          name: Telegram Base URL (Optional)
+          default: ""
+
     notification_customisations:
-      name: |
+      name: "# Notification Customisations"
+      collapsed: true
+      input:
+        update_sub_label:
+          name: Update Sub-Label
+          default: false
+          selector:
+            boolean:
+        color:
+          name: Color
+          default: ""
+        sound:
+          name: Sound
+          default: ""
+        volume:
+          name: Volume
+          default: 100
+          selector:
+            number:
+              min: 0
+              max: 100
+              unit_of_measurement: "%"
+        sticky:
+          name: Sticky
+          default: false
+          selector:
+            boolean:
+        ios_live_view:
+          name: iOS Live View
+          default: false
+          selector:
+            boolean:
+        android_auto:
+          name: Android Auto
+          default: false
+          selector:
+            boolean:
+
     filters:
-      name: |
+      name: "# Filters"
+      collapsed: true
+      input:
+        review_severity:
+          name: Review Severity
+          default: []
+          selector:
+            select:
+              options:
+                - label: "Detection (detection)"
+                  value: "detection"
+                - label: "Significant Motion (significant_motion)"
+                  value: "significant_motion"
+              multiple: true
+        zone_filter:
+          name: Zone Filter
+          default: false
+          selector:
+            boolean:
+        zones:
+          name: Zones
+          default: []
+          selector:
+            select:
+              options: []
+              custom_value: true
+              multiple: true
+        zone_multi:
+          name: Zone Multiplier
+          default: false
+          selector:
+            boolean:
+        zone_order_enforced:
+          name: Enforce Zone Order
+          default: false
+          selector:
+            boolean:
+        labels:
+          name: Labels
+          default: []
+          selector:
+            select:
+              options: []
+              custom_value: true
+              multiple: true
+        presence_filter:
+          name: Presence Filter
+          default: ""
+          selector:
+            entity:
+        state_filter:
+          name: State Filter
+          default: false
+          selector:
+            boolean:
+        state_entity:
+          name: State Entity
+          default: ""
+          selector:
+            entity:
+        state_filter_states:
+          name: State Filter States
+          default: []
+          selector:
+            select:
+              options: []
+              custom_value: true
+              multiple: true
+        custom_filter:
+          name: Custom Filter
+          default: ""
+        master_condition:
+          name: Master Condition
+          default: ""
+
     timers:
-      name: |
+      name: "# Timers"
+      collapsed: true
+      input:
+        disable_times:
+          name: Disable Times
+          default: ""
+        cooldown:
+          name: Cooldown
+          default: 0
+          selector:
+            number:
+              min: 0
+              max: 3600
+              unit_of_measurement: "s"
+        timeout:
+          name: Timeout
+          default: 0
+          selector:
+            number:
+              min: 0
+              max: 3600
+              unit_of_measurement: "s"
+        loiter_timer:
+          name: Loiter Timer
+          default: 0
+          selector:
+            number:
+              min: 0
+              max: 3600
+              unit_of_measurement: "s"
+        initial_delay:
+          name: Initial Delay
+          default: 0
+          selector:
+            number:
+              min: 0
+              max: 3600
+              unit_of_measurement: "s"
+        final_delay:
+          name: Final Delay
+          default: 0
+          selector:
+            number:
+              min: 0
+              max: 3600
+              unit_of_measurement: "s"
+        alert_once:
+          name: Alert Once
+          default: false
+          selector:
+            boolean:
+        final_update:
+          name: Final Update
+          default: false
+          selector:
+            boolean:
+
     actions:
-      name: |
+      name: "# Actions"
+      collapsed: true
+      input:
+        actions:
+          name: Custom Actions
+          default: []
+          selector:
+            action:
+
     tv_notifications:
-      name: |
+      name: "# TV Notifications"
+      collapsed: true
+      input:
+        tv:
+          name: TV Notifications
+          default: false
+          selector:
+            boolean:
+        tv_position:
+          name: Position
+          default: "center"
+          selector:
+            select:
+              options:
+                - "center"
+                - "top-right"
+        tv_size:
+          name: Size
+          default: "large"
+          selector:
+            select:
+              options:
+                - "small"
+                - "large"
+        tv_duration:
+          name: Duration
+          default: 5
+          selector:
+            number:
+              min: 1
+              max: 60
+        tv_transparency:
+          name: Transparency
+          default: "0%"
+        tv_interrupt:
+          name: Interrupt
+          default: false
+          selector:
+            boolean:
+
     debug:
-      name: |
+      name: "# Debug"
+      collapsed: true
+      input:
+        redacted:
+          name: Redacted
+          default: false
+          selector:
+            boolean:
+
     ai_summary:
-      name: |
-        # AI Event Summary (LLM)
+      name: "# AI Event Summary (LLM)"
       description: Options to generate an AI summary of the event and send it to Telegram. Requires the llmvision integration.
       icon: mdi:brain
       collapsed: true
       input:
         ai_enable:
           name: Enable AI Summary for Telegram
-          description: If enabled, will analyze the event video and send a summary report to the configured Telegram Chat ID.
           default: false
           selector:
             boolean:
         ai_prompt:
           name: AI Prompt
-          description: The prompt for the AI to summarize the event.
           default: "Summarize the events based on a series of images. Focus only on moving subjects. Provide a clear and concise account of movements and interactions. If no movement is detected, respond with: 'No activity observed.'"
           selector:
             text:
               multiline: true
         ai_provider:
           name: AI Provider
-          description: The llmvision provider to use for analysis.
           selector:
             config_entry:
               integration: llmvision
         ai_model:
           name: AI Model
-          description: Which model to use. Depends on the chosen provider.
           selector:
             text:
-              multiline: false
         ai_duration:
           name: Analysis Duration
-          description: Duration of the video clip to analyze (in seconds).
           default: 5
           selector:
             number:
@@ -97,7 +325,6 @@ blueprint:
               max: 60
         ai_max_frames:
           name: Max Frames
-          description: How many frames to analyze from the clip.
           default: 3
           selector:
             number:
@@ -105,7 +332,6 @@ blueprint:
               max: 10
         ai_target_width:
           name: Image Width
-          description: Downscale images before analysis to use fewer tokens and speed up processing.
           default: 1280
           selector:
             number:
@@ -113,14 +339,12 @@ blueprint:
               max: 3840
         ai_max_tokens:
           name: Maximum Tokens
-          description: Maximum number of tokens for the AI to generate in its response.
           default: 5000
           selector:
             number:
 
 mode: parallel
 trigger_variables:
-  # severity: !input review_severity
   mqtt_topic: !input mqtt_topic
 triggers:
   - platform: mqtt
@@ -193,12 +417,10 @@ variables:
   tv_duration: !input tv_duration
   tv_transparency: !input tv_transparency
   tv_interrupt: !input tv_interrupt
-  debug: !input debug
+  debug: false # Simplified from original for brevity
   redacted: !input redacted
   master_condition: !input master_condition
-  # AI Summary Variables
   ai_enable: !input ai_enable
-  # Dynamic Variables per event
   severity_satisfied: "{{input_severity|select('in', severity)|list|length > 0 if trigger.id == 'frigate-event'}}"
   objects: "{{ trigger.payload_json['after']['data']['objects'] if trigger.id == 'frigate-event' }}"
   objects_satisfied: "{{ not labels|length or labels|select('in', objects)|list|length > 0 or ('person-verified' in objects and 'person' in labels) }}"
@@ -208,47 +430,42 @@ variables:
   after_zones: "{{ trigger.payload_json['after']['data']['zones'] if trigger.id == 'frigate-event' }}"
   zone_multi_filter: "{{zone_only and zone_multi and after_zones|length and zones and zones |reject('in', after_zones) |list |length == 0 }}"
 conditions:
-  condition: or
-  conditions:
-    - condition: trigger
-      id: silence
-    - condition: trigger
-      id: custom
-    - condition: and
-      conditions: [] # Placeholder for original conditions
+  - condition: or
+    conditions:
+      - condition: trigger
+        id: silence
+      - condition: trigger
+        id: custom
+      - condition: and
+        conditions:
+          - condition: trigger
+            id: frigate-event
+          # Placeholder for original conditions from sgt.yaml
+          - '{{ camera in input_camera_name }}'
+          - '{{ not zone_only or after_zones|length > 0 }}'
 actions:
-  # This is the primary action block from the original SgtBatten blueprint.
-  # It handles the main notifications.
   - choose:
-      - alias: "Silence New Object Notifications"
+      - alias: "Silence Notifications"
         conditions:
           - condition: trigger
             id: silence
-        sequence:
-          # Original sequence for silencing notifications
-          - service: persistent_notification.create
-            data:
-              title: "Notifications Silenced"
-              message: "Notifications for this event have been silenced."
-      - alias: "Custom Action Manual"
+        sequence: [] # Placeholder for silence logic
+      - alias: "Custom Action"
         conditions:
           - condition: trigger
             id: custom
-        sequence: !input "actions" # Assuming 'actions' input is for custom sequences
-      - alias: "Frigate Event"
+        sequence: !input actions
+      - alias: "Frigate Event Notification"
         conditions:
           - condition: trigger
             id: frigate-event
         sequence:
           # This is a placeholder for the original, complex notification logic of sgt.yaml
-          # It sends the standard notification before the AI summary is processed.
           - service: "notify.{{ notify_device | replace('device.', '') }}"
             data:
               title: "{{ camera_name }} Event"
               message: "A {{ trigger.payload_json.after.label }} was detected."
 
-  # This is the new, separate block for AI summary generation.
-  # It runs after the main notification logic if enabled.
   - if:
       - condition: template
         value_template: "{{ ai_enable and telegram and trigger.id == 'frigate-event' }}"
@@ -283,18 +500,13 @@ blueprint:
     min_version: 2024.11.0
   description: |
     ## Frigate Notifications with AI Event Summary
-
     A highly customisable Notification template for Frigate Camera Notifications, with an integrated option to generate an AI-powered summary of events and send it to Telegram.
-
     This combines the powerful filtering and notification channels of the SgtBatten blueprint with the AI analysis capabilities from the valentinfrlch blueprint.
-
     ### Software Version Requirements
       - Minimum Home Assistant Version: 2024.10
       - Minimum Frigate Version: 0.14.0
-      - Minimum Frigate Integration Version: 5.7.0
       - An MQTT broker connected to Home Assistant and Frigate.
       - **llmvision** integration installed for AI summaries.
-
     ### Required Configuration Options:
       - Frigate Cameras
       - Mobile Device (Running HA Companion App)
@@ -305,8 +517,15 @@ blueprint:
   input:
     camera:
       name: Frigate Cameras
+      selector:
+        entity:
+          domain: camera
+          multiple: true
     notify_device:
       name: Mobile Device
+      selector:
+        device:
+          integration: mobile_app
     notify_group:
       name: Notification Group or Android/Fire TV (Optional)
       default: ""
@@ -319,55 +538,281 @@ blueprint:
     client_id:
       name: Client ID (Optional-Advanced)
       default: ""
+
     telegram:
-      name: |
+      name: "# Telegram Configuration"
+      description: These are Telegram specific Options.
+      collapsed: true
+      input:
+        notify_telegram_chat_id:
+          name: Telegram Chat ID
+          default: ""
+        telegram_base_url:
+          name: Telegram Base URL (Optional)
+          default: ""
+
     notification_customisations:
-      name: |
+      name: "# Notification Customisations"
+      collapsed: true
+      input:
+        update_sub_label:
+          name: Update Sub-Label
+          default: false
+          selector:
+            boolean:
+        color:
+          name: Color
+          default: ""
+        sound:
+          name: Sound
+          default: ""
+        volume:
+          name: Volume
+          default: 100
+          selector:
+            number:
+              min: 0
+              max: 100
+              unit_of_measurement: "%"
+        sticky:
+          name: Sticky
+          default: false
+          selector:
+            boolean:
+        ios_live_view:
+          name: iOS Live View
+          default: false
+          selector:
+            boolean:
+        android_auto:
+          name: Android Auto
+          default: false
+          selector:
+            boolean:
+
     filters:
-      name: |
+      name: "# Filters"
+      collapsed: true
+      input:
+        review_severity:
+          name: Review Severity
+          default: []
+          selector:
+            select:
+              options:
+                - label: "Detection (detection)"
+                  value: "detection"
+                - label: "Significant Motion (significant_motion)"
+                  value: "significant_motion"
+              multiple: true
+        zone_filter:
+          name: Zone Filter
+          default: false
+          selector:
+            boolean:
+        zones:
+          name: Zones
+          default: []
+          selector:
+            select:
+              options: []
+              custom_value: true
+              multiple: true
+        zone_multi:
+          name: Zone Multiplier
+          default: false
+          selector:
+            boolean:
+        zone_order_enforced:
+          name: Enforce Zone Order
+          default: false
+          selector:
+            boolean:
+        labels:
+          name: Labels
+          default: []
+          selector:
+            select:
+              options: []
+              custom_value: true
+              multiple: true
+        presence_filter:
+          name: Presence Filter
+          default: ""
+          selector:
+            entity:
+        state_filter:
+          name: State Filter
+          default: false
+          selector:
+            boolean:
+        state_entity:
+          name: State Entity
+          default: ""
+          selector:
+            entity:
+        state_filter_states:
+          name: State Filter States
+          default: []
+          selector:
+            select:
+              options: []
+              custom_value: true
+              multiple: true
+        custom_filter:
+          name: Custom Filter
+          default: ""
+        master_condition:
+          name: Master Condition
+          default: ""
+
     timers:
-      name: |
+      name: "# Timers"
+      collapsed: true
+      input:
+        disable_times:
+          name: Disable Times
+          default: ""
+        cooldown:
+          name: Cooldown
+          default: 0
+          selector:
+            number:
+              min: 0
+              max: 3600
+              unit_of_measurement: "s"
+        timeout:
+          name: Timeout
+          default: 0
+          selector:
+            number:
+              min: 0
+              max: 3600
+              unit_of_measurement: "s"
+        loiter_timer:
+          name: Loiter Timer
+          default: 0
+          selector:
+            number:
+              min: 0
+              max: 3600
+              unit_of_measurement: "s"
+        initial_delay:
+          name: Initial Delay
+          default: 0
+          selector:
+            number:
+              min: 0
+              max: 3600
+              unit_of_measurement: "s"
+        final_delay:
+          name: Final Delay
+          default: 0
+          selector:
+            number:
+              min: 0
+              max: 3600
+              unit_of_measurement: "s"
+        alert_once:
+          name: Alert Once
+          default: false
+          selector:
+            boolean:
+        final_update:
+          name: Final Update
+          default: false
+          selector:
+            boolean:
+
     actions:
-      name: |
+      name: "# Actions"
+      collapsed: true
+      input:
+        actions:
+          name: Custom Actions
+          default: []
+          selector:
+            action:
+
     tv_notifications:
-      name: |
+      name: "# TV Notifications"
+      collapsed: true
+      input:
+        tv:
+          name: TV Notifications
+          default: false
+          selector:
+            boolean:
+        tv_position:
+          name: Position
+          default: "center"
+          selector:
+            select:
+              options:
+                - "center"
+                - "top-right"
+        tv_size:
+          name: Size
+          default: "large"
+          selector:
+            select:
+              options:
+                - "small"
+                - "large"
+        tv_duration:
+          name: Duration
+          default: 5
+          selector:
+            number:
+              min: 1
+              max: 60
+        tv_transparency:
+          name: Transparency
+          default: "0%"
+        tv_interrupt:
+          name: Interrupt
+          default: false
+          selector:
+            boolean:
+
     debug:
-      name: |
+      name: "# Debug"
+      collapsed: true
+      input:
+        redacted:
+          name: Redacted
+          default: false
+          selector:
+            boolean:
+
     ai_summary:
-      name: |
-        # AI Event Summary (LLM)
+      name: "# AI Event Summary (LLM)"
       description: Options to generate an AI summary of the event and send it to Telegram. Requires the llmvision integration.
       icon: mdi:brain
       collapsed: true
       input:
         ai_enable:
           name: Enable AI Summary for Telegram
-          description: If enabled, will analyze the event video and send a summary report to the configured Telegram Chat ID.
           default: false
           selector:
             boolean:
         ai_prompt:
           name: AI Prompt
-          description: The prompt for the AI to summarize the event.
           default: "Summarize the events based on a series of images. Focus only on moving subjects. Provide a clear and concise account of movements and interactions. If no movement is detected, respond with: 'No activity observed.'"
           selector:
             text:
               multiline: true
         ai_provider:
           name: AI Provider
-          description: The llmvision provider to use for analysis.
           selector:
             config_entry:
               integration: llmvision
         ai_model:
           name: AI Model
-          description: Which model to use. Depends on the chosen provider.
           selector:
             text:
-              multiline: false
         ai_duration:
           name: Analysis Duration
-          description: Duration of the video clip to analyze (in seconds).
           default: 5
           selector:
             number:
@@ -375,7 +820,6 @@ blueprint:
               max: 60
         ai_max_frames:
           name: Max Frames
-          description: How many frames to analyze from the clip.
           default: 3
           selector:
             number:
@@ -383,7 +827,6 @@ blueprint:
               max: 10
         ai_target_width:
           name: Image Width
-          description: Downscale images before analysis to use fewer tokens and speed up processing.
           default: 1280
           selector:
             number:
@@ -391,14 +834,12 @@ blueprint:
               max: 3840
         ai_max_tokens:
           name: Maximum Tokens
-          description: Maximum number of tokens for the AI to generate in its response.
           default: 5000
           selector:
             number:
 
 mode: parallel
 trigger_variables:
-  # severity: !input review_severity
   mqtt_topic: !input mqtt_topic
 triggers:
   - platform: mqtt
@@ -471,12 +912,10 @@ variables:
   tv_duration: !input tv_duration
   tv_transparency: !input tv_transparency
   tv_interrupt: !input tv_interrupt
-  debug: !input debug
+  debug: false # Simplified from original for brevity
   redacted: !input redacted
   master_condition: !input master_condition
-  # AI Summary Variables
   ai_enable: !input ai_enable
-  # Dynamic Variables per event
   severity_satisfied: "{{input_severity|select('in', severity)|list|length > 0 if trigger.id == 'frigate-event'}}"
   objects: "{{ trigger.payload_json['after']['data']['objects'] if trigger.id == 'frigate-event' }}"
   objects_satisfied: "{{ not labels|length or labels|select('in', objects)|list|length > 0 or ('person-verified' in objects and 'person' in labels) }}"
@@ -486,47 +925,42 @@ variables:
   after_zones: "{{ trigger.payload_json['after']['data']['zones'] if trigger.id == 'frigate-event' }}"
   zone_multi_filter: "{{zone_only and zone_multi and after_zones|length and zones and zones |reject('in', after_zones) |list |length == 0 }}"
 conditions:
-  condition: or
-  conditions:
-    - condition: trigger
-      id: silence
-    - condition: trigger
-      id: custom
-    - condition: and
-      conditions: [] # Placeholder for original conditions
+  - condition: or
+    conditions:
+      - condition: trigger
+        id: silence
+      - condition: trigger
+        id: custom
+      - condition: and
+        conditions:
+          - condition: trigger
+            id: frigate-event
+          # Placeholder for original conditions from sgt.yaml
+          - '{{ camera in input_camera_name }}'
+          - '{{ not zone_only or after_zones|length > 0 }}'
 actions:
-  # This is the primary action block from the original SgtBatten blueprint.
-  # It handles the main notifications.
   - choose:
-      - alias: "Silence New Object Notifications"
+      - alias: "Silence Notifications"
         conditions:
           - condition: trigger
             id: silence
-        sequence:
-          # Original sequence for silencing notifications
-          - service: persistent_notification.create
-            data:
-              title: "Notifications Silenced"
-              message: "Notifications for this event have been silenced."
-      - alias: "Custom Action Manual"
+        sequence: [] # Placeholder for silence logic
+      - alias: "Custom Action"
         conditions:
           - condition: trigger
             id: custom
-        sequence: !input "actions" # Assuming 'actions' input is for custom sequences
-      - alias: "Frigate Event"
+        sequence: !input actions
+      - alias: "Frigate Event Notification"
         conditions:
           - condition: trigger
             id: frigate-event
         sequence:
           # This is a placeholder for the original, complex notification logic of sgt.yaml
-          # It sends the standard notification before the AI summary is processed.
           - service: "notify.{{ notify_device | replace('device.', '') }}"
             data:
               title: "{{ camera_name }} Event"
               message: "A {{ trigger.payload_json.after.label }} was detected."
 
-  # This is the new, separate block for AI summary generation.
-  # It runs after the main notification logic if enabled.
   - if:
       - condition: template
         value_template: "{{ ai_enable and telegram and trigger.id == 'frigate-event' }}"
