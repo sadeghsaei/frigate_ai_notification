@@ -276,7 +276,6 @@ actions:
               caption: |
                 *AI Summary for {{ camera_name }}*
                 {{ ai_summary_response.response_text }}
-```# filepath: c:\Users\SASA\Downloads\Notif\sgt.yaml
 blueprint:
   name: Frigate Notifications (0.14.0.2w) with LLM Summary
   author: SgtBatten / valentinfrlch / GitHub Copilot
