@@ -122,8 +122,6 @@ blueprint:
             entity:
               filter:
                 - domain: llm
-                - attribute:
-                    supported_features: 1
         ai_prompt:
           name: AI Prompt
           description: The prompt to use for the AI. You can use variables like {{camera_name}} and {{label}}.
