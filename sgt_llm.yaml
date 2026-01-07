@@ -972,6 +972,7 @@ actions:
               message: "{{ genai_text }}"
               
               # Inputs
+              id: "{{ review_id }}"
               subtitle: !input subtitle
               critical_input: !input critical
               critical: "{{ true if critical_input == 'true' else true if critical_input == True else false }}"
