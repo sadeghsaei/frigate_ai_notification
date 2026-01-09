@@ -1,21 +1,25 @@
 blueprint:
-  name: Frigate Notifications (Stable GenAI Fixed)
+  name: Frigate Notifications (Stable + GenAI Fix)
   author: SgtBatten (Modified)
   homeassistant:
     min_version: 2024.11.0
   description: |
-    ## Frigate Notifications (Stable + GenAI Support)
+    ## Frigate Notifications (Stable Mod)
     
-    Modified to support Frigate 0.17+ GenAI descriptions sent via 'frigate/tracked_object_update'.
+    **Modified for GenAI Support:**
+    - Adds trigger for 'frigate/tracked_object_update'
+    - Adds logic to parse and send Gemini/GenAI descriptions
+    - Fixes "404" attachment errors by defining the correct Event ID
     
-    ### Original Description:
-    A highly customisable Notification template for Frigate Camera Notifications.
+    Original Version: 0.14.0.2w
 
   domain: automation
   input:
     camera:
       name: Frigate Cameras
-      description: Select the cameras that will trigger notifications.
+      description: |
+        Select the cameras that will trigger notifications. 
+        If you do not see cameras listed in the drop-down, check you have the Frigate integration installed.
       selector:
         entity:
           filter:
@@ -32,11 +36,15 @@ blueprint:
             integration: mobile_app
     notify_group:
       name: Notification Group or Android/Fire TV (Optional)
-      description: The name of the group or individual TV to send notifications to.
+      description: |
+        The name of the group or individual TV to send notifications to.
+        If set, this will override the individual devices above.
       default: ""
     base_url:
       name: Base URL (Optional)
-      description: The external URL for your Home Assistant instance.
+      description: |
+        The external URL for your Home Assistant instance.
+        Recommended for iOS and required for Android/Fire TV.
       default: ""
     mqtt_topic:
       name: MQTT Topic (Advanced)
@@ -48,6 +56,7 @@ blueprint:
       default: ""
     telegram:
       name: Telegram Configuration
+      description: These are Telegram specific Options.
       icon: mdi:phone-outline
       collapsed: true
       input:
@@ -59,6 +68,7 @@ blueprint:
           default: ""
     notification_customisations:
       name: Notification Customisations
+      description: These are Notification Customisation Options
       icon: mdi:bell
       collapsed: true
       input:
@@ -585,6 +595,8 @@ blueprint:
                   value: /ccab4aaf_frigate-proxy/dashboard
                 - label: Open Reolink App (Android)
                   value: app://com.mcu.reolink
+                - label: Custom Action (Manual Trigger)
+                  value: custom-{{ this.entity_id }}
               custom_value: true
         icon_1:
           name: Action Button 1 icon - iOS Only
@@ -898,7 +910,7 @@ actions:
         conditions:
           - condition: or
             conditions:
-              # Check for standard GenAI event (if your version supports it on main topic)
+              # Check for standard GenAI event
               - condition: and
                 conditions:
                   - condition: trigger
@@ -967,6 +979,11 @@ actions:
               tv_interrupt: !input tv_interrupt
               attachment: !input attachment
               video: !input video
+              # Fix: Add tts variables to scope
+              tts: !input tts
+              tts_helper: !input tts_helper
+              alert_once: !input alert_once
+              loitering: false
           - alias: "Send GenAI Notification"
             sequence:
               - choose:
@@ -1091,7 +1108,6 @@ actions:
                         tag: "{{ tag }}"
                         group: "{{ group }}"
                         color: "{{color}}"
-                        # Android Specific
                         subject: "{{subtitle}}"
                         image: "{{attachment}}"
                         video: "{{video}}"
@@ -1102,14 +1118,12 @@ actions:
                         sticky: "{{sticky}}"
                         channel: "{{'alarm_stream' if critical else channel}}"
                         car_ui: "{{android_auto}}"
-                        # Android/Fire TV
                         subtitle: "{{subtitle}}"
                         fontsize: "{{tv_size}}"
                         position: "{{tv_position}}"
                         duration: "{{tv_duration}}"
                         transparency: "{{tv_transparency}}"
                         interrupt: "{{tv_interrupt}}"
-                        # iOS Specific
                         url: "{{tap_action}}"
                         attachment:
                           url: "{{video if video else attachment }}"
@@ -1120,7 +1134,6 @@ actions:
                             volume: "{{ iif(sound == 'none', 0, volume) }}"
                           critical: "{{ iif(critical, 1, 0) }}"
                         entity_id: "{{ios_live_view}}"
-                        # Actions
                         actions:
                           - action: URI
                             title: "{{button_1}}"
@@ -1135,37 +1148,38 @@ actions:
                             uri: "{{url_3}}"
                             icon: "{{icon_3}}"
                             destructive: true
-                      - if: "{{tts and (not tts_helper or not alert_once or (tts_helper and id not in states(tts_helper)))}}"
-                        then:
-                          sequence:
-                            - choose:
-                                - conditions: "{{ not notify_group_target }}"
-                                  sequence:
-                                    - device_id: !input notify_device
-                                      domain: mobile_app
-                                      type: notify
-                                      message: "{{'TTS'}}"
-                                      data:
-                                        tag: "{{ tag }}{{'-tts'}}"
-                                        channel: "{{'alarm_stream' if critical else channel}}"
-                                        alert_once: "{{ alert_once }}"
-                                        tts_text: "{{message}}"
-                              default:
-                                - action: "notify.{{ notify_group_target }}"
+                  # Fixed indentation for TTS block
+                  - if: "{{tts and (not tts_helper or not alert_once or (tts_helper and id not in states(tts_helper)))}}"
+                    then:
+                      sequence:
+                        - choose:
+                            - conditions: "{{ not notify_group_target }}"
+                              sequence:
+                                - device_id: !input notify_device
+                                  domain: mobile_app
+                                  type: notify
+                                  message: "{{'TTS'}}"
                                   data:
-                                    message: "{{'TTS'}}"
-                                    data:
-                                      tag: "{{ tag }}{{'-tts'}}"
-                                      channel: "{{'alarm_stream' if critical else channel}}"
-                                      alert_once: "{{ alert_once }}"
-                                      tts_text: "{{message}}"
-                            - action: input_text.set_value
+                                    tag: "{{ tag }}{{'-tts'}}"
+                                    channel: "{{'alarm_stream' if critical else channel}}"
+                                    alert_once: "{{ alert_once }}"
+                                    tts_text: "{{message}}"
+                          default:
+                            - action: "notify.{{ notify_group_target }}"
                               data:
-                                value: |
-                                  {% set newIds = id + '|' + states(tts_helper) %}
-                                  {{ newIds[:250] }}
-                              target:
-                                entity_id: "{{tts_helper}}"
+                                message: "{{'TTS'}}"
+                                data:
+                                  tag: "{{ tag }}{{'-tts'}}"
+                                  channel: "{{'alarm_stream' if critical else channel}}"
+                                  alert_once: "{{ alert_once }}"
+                                  tts_text: "{{message}}"
+                        - action: input_text.set_value
+                          data:
+                            value: |
+                              {% set newIds = id + '|' + states(tts_helper) %}
+                              {{ newIds[:250] }}
+                          target:
+                            entity_id: "{{tts_helper}}"
       - alias: "Frigate Event"
         conditions:
           - condition: trigger
@@ -1374,6 +1388,12 @@ actions:
                                   target: "{{telegram_chat_id}}"
                                   caption: "{{message}}"
                                   url: "{{attachment|replace( base_url, telegram_base_url )}}"
+                                  inline_keyboard:
+                                    - [
+                                        ["{{button_1}}", "{{url_1}}"],
+                                        ["{{button_2}}", "{{url_2}}"],
+                                      ]
+                                    - [["{{button_3}}", "{{url_3}}"]]
                           - conditions: "{{ not notify_group_target }}"
                             sequence:
                               - device_id: !input notify_device
@@ -1406,7 +1426,7 @@ actions:
                                     sound:
                                       name: "{{sound}}"
                                       volume: "{{ iif(sound == 'none', 0, volume) }}"
-                                      critical: "{{ iif(critical, 1, 0) }}"
+                                    critical: "{{ iif(critical, 1, 0) }}"
                                   entity_id: "{{ios_live_view}}"
                                   # Actions
                                   actions:
@@ -1462,7 +1482,7 @@ actions:
                                       sound:
                                         name: "{{sound}}"
                                         volume: "{{ iif(sound == 'none', 0, volume) }}"
-                                        critical: "{{ iif(critical, 1, 0) }}"
+                                      critical: "{{ iif(critical, 1, 0) }}"
                                     entity_id: "{{ios_live_view}}"
                                     # Actions
                                     actions:
@@ -1515,7 +1535,7 @@ actions:
                                   sound:
                                     name: "{{sound}}"
                                     volume: "{{ iif(sound == 'none', 0, volume) }}"
-                                    critical: "{{ iif(critical, 1, 0) }}"
+                                  critical: "{{ iif(critical, 1, 0) }}"
                                 entity_id: "{{ios_live_view}}"
                                 # Actions
                                 actions:
@@ -1933,7 +1953,7 @@ actions:
                                             sound:
                                               name: "{{ iif(silent_update, 'none', sound) }}"
                                               volume: "{{ iif((silent_update or sound == 'none'), 0, volume) }}"
-                                              critical: "{{ iif(critical, 1, 0) }}"
+                                            critical: "{{ iif(critical, 1, 0) }}"
                                           entity_id: "{{ios_live_view}}"
                                           # Actions
                                           actions:
@@ -1972,13 +1992,13 @@ actions:
                                       channel: "{{'alarm_stream' if critical else channel}}"
                                       car_ui: "{{android_auto}}"
                                       # Android/Fire TV
-                                      subtitle: "{{subtitle}}"
                                       fontsize: "{{tv_size}}"
                                       position: "{{tv_position}}"
                                       duration: "{{tv_duration}}"
                                       transparency: "{{tv_transparency}}"
                                       interrupt: "{{tv_interrupt}}"
                                       # iOS Specific
+                                      subtitle: "{{subtitle}}"
                                       url: "{{tap_action}}"
                                       attachment:
                                         url: "{{video if video else attachment }}"
@@ -2004,3 +2024,37 @@ actions:
                                           uri: "{{url_3}}"
                                           icon: "{{icon_3}}"
                                           destructive: true
+
+                            - if: "{{tts and (not tts_helper or not alert_once or (tts_helper and id not in states(tts_helper)))}}"
+                              then:
+                                sequence:
+                                  - choose:
+                                      - conditions: "{{ not notify_group_target }}"
+                                        sequence:
+                                          - device_id: !input notify_device
+                                            domain: mobile_app
+                                            type: notify
+                                            message: "{{'TTS'}}"
+                                            data:
+                                              tag: "{{ id }}{{'-loitering-tts' if loitering}}"
+                                              channel: "{{'alarm_stream' if critical else channel}}"
+                                              alert_once: "{{ alert_once }}"
+                                              tts_text: "{{message}}"
+
+                                    default:
+                                      - action: "notify.{{ notify_group_target }}"
+                                        data:
+                                          message: "{{'TTS'}}"
+                                          data:
+                                            tag: "{{ id }}{{'-loitering-tts' if loitering}}"
+                                            channel: "{{'alarm_stream' if critical else channel}}"
+                                            alert_once: "{{ alert_once }}"
+                                            tts_text: "{{message}}"
+                                  - action: input_text.set_value
+                                    data:
+                                      value: |
+                                        {% set newIds = id + '|' + states(tts_helper) %}
+                                        {{ newIds[:250] }}
+                                    target:
+                                      entity_id: "{{tts_helper}}"
+              until: "{{ not wait.trigger or wait.trigger.payload_json['type'] == 'end' }}"
