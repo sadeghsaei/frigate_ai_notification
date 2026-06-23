@@ -1,20 +1,17 @@
 blueprint:
-  name: Frigate Notifications (0.14.0.2y - GenAI Enhanced)
+  name: Frigate Notifications (0.14.0.2y - Slim GenAI Fixed)
   author: SgtBatten
   homeassistant:
     min_version: 2024.11.0
   description: |
-    ## Frigate Notifications Enhanced
-
-    A modified blueprint layout built to support standard Frigate events alongside GenAI tracking object description notifications.
-
+    ## Frigate Notifications Enhanced (Slim & Fixed)
+    A streamlined notification template for Frigate Camera Notifications supporting standard reviews and GenAI object descriptions.
   domain: automation
   source_url: https://github.com/SgtBatten/HA_blueprints/blob/main/Frigate_Camera_Notifications/Beta.yaml
   input:
     camera:
       name: Frigate Cameras
-      description: |
-        Select the cameras that will trigger notifications.
+      description: Select the cameras that will trigger notifications.
       selector:
         entity:
           filter:
@@ -223,6 +220,36 @@ blueprint:
     final_delay:
       name: Post Event Wrap Delay Timer
       default: 5
+    tap_action:
+      name: Tap Action URL
+      default: "{{base_url}}/api/frigate{{client_id}}/notifications/{{id}}/{{camera}}/clip.mp4"
+    button_1:
+      name: Action Button 1 Text
+      default: "View Clip"
+    url_1:
+      name: Action Button 1 URL
+      default: "{{base_url}}/api/frigate{{client_id}}/notifications/{{id}}/{{camera}}/clip.mp4"
+    icon_1:
+      name: Action Button 1 Icon (iOS)
+      default: ""
+    button_2:
+      name: Action Button 2 Text
+      default: "View Snapshot"
+    url_2:
+      name: Action Button 2 URL
+      default: "{{base_url}}/api/frigate{{client_id}}/notifications/{{id}}/snapshot.jpg"
+    icon_2:
+      name: Action Button 2 Icon (iOS)
+      default: ""
+    button_3:
+      name: Action Button 3 Text
+      default: "Silence New Notifications"
+    url_3:
+      name: Action Button 3 URL
+      default: silence-{{ this.entity_id }}
+    icon_3:
+      name: Action Button 3 Icon (iOS)
+      default: ""
     custom_action_manual:
       name: Custom Manual Button Triggers Actions List
       default: []
@@ -258,16 +285,6 @@ blueprint:
     tv_interrupt:
       name: TV Application Interrupt Control Check
       default: false
-      selector:
-        boolean:
-    debug:
-      name: System Debug Diagnostics Logger Logging
-      default: false
-      selector:
-        boolean:
-    redacted:
-      name: Scrub External URL Signatures
-      default: true
       selector:
         boolean:
 
@@ -363,9 +380,6 @@ variables:
   tv_duration: !input tv_duration
   tv_transparency: !input tv_transparency
   tv_interrupt: !input tv_interrupt
-  debug: !input debug
-  redacted: !input redacted
-  master_condition: !input master_condition
   severity_satisfied: "{{input_severity|select('in', severity)|list|length > 0 if trigger.id in ['frigate-event', 'genai-event'] else true}}"
   objects: "{{ trigger.payload_json['after']['data']['objects'] if trigger.id in ['frigate-event', 'genai-event'] else [] }}"
   objects_satisfied: "{{ not labels|length or labels|select('in', objects)|list|length > 0 or objects|map('regex_replace', '-verified$', '')|select('in', labels)|list|length > 0 }}"
