@@ -1,10 +1,10 @@
 blueprint:
-  name: Frigate Notifications (0.14.0.2y - Slim GenAI)
+  name: Frigate Notifications (0.14.0.2y - Slim GenAI Fixed)
   author: SgtBatten
   homeassistant:
     min_version: 2024.11.0
   description: |
-    ## Frigate Notifications Enhanced (Slim)
+    ## Frigate Notifications Enhanced (Slim & Fixed)
     A streamlined notification template for Frigate Camera Notifications supporting standard reviews and GenAI object descriptions.
   domain: automation
   source_url: https://github.com/SgtBatten/HA_blueprints/blob/main/Frigate_Camera_Notifications/Beta.yaml
@@ -220,6 +220,36 @@ blueprint:
     final_delay:
       name: Post Event Wrap Delay Timer
       default: 5
+    tap_action:
+      name: Tap Action URL
+      default: "{{base_url}}/api/frigate{{client_id}}/notifications/{{id}}/{{camera}}/clip.mp4"
+    button_1:
+      name: Action Button 1 Text
+      default: "View Clip"
+    url_1:
+      name: Action Button 1 URL
+      default: "{{base_url}}/api/frigate{{client_id}}/notifications/{{id}}/{{camera}}/clip.mp4"
+    icon_1:
+      name: Action Button 1 Icon (iOS)
+      default: ""
+    button_2:
+      name: Action Button 2 Text
+      default: "View Snapshot"
+    url_2:
+      name: Action Button 2 URL
+      default: "{{base_url}}/api/frigate{{client_id}}/notifications/{{id}}/snapshot.jpg"
+    icon_2:
+      name: Action Button 2 Icon (iOS)
+      default: ""
+    button_3:
+      name: Action Button 3 Text
+      default: "Silence New Notifications"
+    url_3:
+      name: Action Button 3 URL
+      default: silence-{{ this.entity_id }}
+    icon_3:
+      name: Action Button 3 Icon (iOS)
+      default: ""
     custom_action_manual:
       name: Custom Manual Button Triggers Actions List
       default: []
